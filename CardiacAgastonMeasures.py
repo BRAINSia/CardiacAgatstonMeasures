@@ -37,4 +37,29 @@ class CardiacAgastonMeasuresWidget:
 
     def setup(self):
         # Instantiate and connect widgets ...
-        pass
+        
+        # Collapsible button
+        sampleCollapsibleButton = ctk.ctkCollapsibleButton()
+        sampleCollapsibleButton.text = "A collapsible button"
+        self.layout.addWidget(sampleCollapsibleButton)
+        
+        # Layout within the sample collapsible button
+        sampleFormLayout = qt.QFormLayout(sampleCollapsibleButton)
+        
+        # HelloWorld button
+        helloWorldButton = qt.QPushButton("Hello world")
+        helloWorldButton.toolTip = "Print 'Hello world' in standard output"
+        sampleFormLayout.addWidget(helloWorldButton)
+        helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
+        
+        
+        # Add vertical spacer
+        self.layout.addStretch(1)
+        
+        # Set local var as instance attribute
+        self.helloWorldButton = helloWorldButton
+        
+    def onHelloWorldButtonClicked(self):
+        print "Hey World !"
+        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Hello There!!!')
+
