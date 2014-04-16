@@ -39,17 +39,17 @@ class CardiacAgastonMeasuresWidget:
         # Instantiate and connect widgets ...
         
         # Collapsible button
-        sampleCollapsibleButton = ctk.ctkCollapsibleButton()
-        sampleCollapsibleButton.text = "A collapsible button"
-        self.layout.addWidget(sampleCollapsibleButton)
+        measuresCollapsibleButton = ctk.ctkCollapsibleButton()
+        measuresCollapsibleButton.text = "Cardiac Agaston Measures"
+        self.layout.addWidget(measuresCollapsibleButton)
         
         # Layout within the sample collapsible button
-        sampleFormLayout = qt.QFormLayout(sampleCollapsibleButton)
+        measuresFormLayout = qt.QFormLayout(measuresCollapsibleButton)
         
         # HelloWorld button
         helloWorldButton = qt.QPushButton("Hello world")
         helloWorldButton.toolTip = "Print 'Hello world' in standard output"
-        sampleFormLayout.addWidget(helloWorldButton)
+        measuresFormLayout.addWidget(helloWorldButton)
         helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
         
         
