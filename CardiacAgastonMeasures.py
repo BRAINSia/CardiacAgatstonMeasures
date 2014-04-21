@@ -24,6 +24,8 @@ class CardiacAgastonMeasures:
 
 class CardiacAgastonMeasuresWidget:
     def __init__(self, parent = None):
+        self.currentRegistrationInterface = None
+
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -38,6 +40,28 @@ class CardiacAgastonMeasuresWidget:
     def setup(self):
         # Instantiate and connect widgets ...
         
+        #
+        # Reload and Test area
+        #
+        if True:
+            """Developer interface"""
+            reloadCollapsibleButton = ctk.ctkCollapsibleButton()
+            reloadCollapsibleButton.text = "Advanced - Reload && Test"
+            reloadCollapsibleButton.collapsed = False
+            self.layout.addWidget(reloadCollapsibleButton)
+            reloadFormLayout = qt.QFormLayout(reloadCollapsibleButton)
+            
+            # reload button
+            # (use this during development, but remove it when delivering
+            #  your module to users)
+            self.reloadButton = qt.QPushButton("Reload")
+            self.reloadButton.toolTip = "Reload this module."
+            self.reloadButton.name = "CardiacAgastonMeasures Reload"
+            reloadFormLayout.addWidget(self.reloadButton)
+            #self.reloadButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
+            self.reloadButton.connect('clicked()', self.onReload)
+        
+        
         # Collapsible button
         measuresCollapsibleButton = ctk.ctkCollapsibleButton()
         measuresCollapsibleButton.text = "Cardiac Agaston Measures"
@@ -47,7 +71,7 @@ class CardiacAgastonMeasuresWidget:
         measuresFormLayout = qt.QFormLayout(measuresCollapsibleButton)
         
         # HelloWorld button
-        helloWorldButton = qt.QPushButton("Hello world")
+        helloWorldButton = qt.QPushButton("Hello World")
         helloWorldButton.toolTip = "Print 'Hello world' in standard output"
         measuresFormLayout.addWidget(helloWorldButton)
         helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
@@ -62,4 +86,86 @@ class CardiacAgastonMeasuresWidget:
     def onHelloWorldButtonClicked(self):
         print "Hey World !"
         qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Hello There!!!')
+
+
+    def onReload(self,moduleName="CardiacAgastonMeasures"):
+        """Generic reload method for any scripted module.
+            ModuleWizard will subsitute correct default moduleName.
+            Note: customized for use in LandmarkRegistration
+            """
+        import imp, sys, os, slicer
+
+        # first, destroy the current plugin, since it will
+        # contain subclasses of the RegistrationLib modules
+        if self.currentRegistrationInterface:
+            self.currentRegistrationInterface.destroy()
+
+        # now reload the RegistrationLib source code
+        # - set source file path
+        # - load the module to the global space
+        filePath = eval('slicer.modules.%s.path' % moduleName.lower())
+        p = os.path.dirname(filePath)
+        if not sys.path.__contains__(p):
+            sys.path.insert(0,p)
+        for subModuleName in ("pqWidget", "Visualization", "Landmarks", ):
+            fp = open(filePath, "r")
+            globals()[subModuleName] = imp.load_module(subModuleName, fp, filePath, ('.py', 'r', imp.PY_SOURCE))
+            fp.close()
+
+        # # now reload all the support code and have the plugins
+        # # re-register themselves with slicer
+        # oldPlugins = slicer.modules.registrationPlugins
+        # slicer.modules.registrationPlugins = {}
+        # for plugin in oldPlugins.values():
+        #     pluginModuleName = plugin.__module__.lower()
+        #     if hasattr(slicer.modules,pluginModuleName):
+        #         # for a plugin from an extension, need to get the source path
+        #         # from the module
+        #         module = getattr(slicer.modules,pluginModuleName)
+        #         sourceFile = module.path
+        #     else:
+        #         # for a plugin built with slicer itself, the file path comes
+        #         # from the pyc path noted as __file__ at startup time
+        #         sourceFile = plugin.sourceFile.replace('.pyc', '.py')
+        #     imp.load_source(plugin.__module__, sourceFile)
+        # oldPlugins = None
+
+        widgetName = moduleName + "Widget"
+
+        # now reload the widget module source code
+        # - set source file path
+        # - load the module to the global space
+        filePath = eval('slicer.modules.%s.path' % moduleName.lower())
+        p = os.path.dirname(filePath)
+        if not sys.path.__contains__(p):
+            sys.path.insert(0,p)
+        fp = open(filePath, "r")
+        globals()[moduleName] = imp.load_module(
+            moduleName, fp, filePath, ('.py', 'r', imp.PY_SOURCE))
+        fp.close()
+
+        # rebuild the widget
+        # - find and hide the existing widget
+        # - create a new widget in the existing parent
+        parent = slicer.util.findChildren(name='%s Reload' % moduleName)[0].parent().parent()
+        for child in parent.children():
+          try:
+            child.hide()
+          except AttributeError:
+            pass
+        # Remove spacer items
+        item = parent.layout().itemAt(0)
+        while item:
+          parent.layout().removeItem(item)
+          item = parent.layout().itemAt(0)
+
+        # # delete the old widget instance
+        # if hasattr(globals()['slicer'].modules, widgetName):
+        #   getattr(globals()['slicer'].modules, widgetName).cleanup()
+
+        # create new widget inside existing parent
+        globals()[widgetName.lower()] = eval(
+            'globals()["%s"].%s(parent)' % (moduleName, widgetName))
+        globals()[widgetName.lower()].setup()
+        setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
 
