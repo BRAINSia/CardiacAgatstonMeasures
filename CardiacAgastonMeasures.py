@@ -63,17 +63,30 @@ class CardiacAgastonMeasuresWidget:
         
         
         # Collapsible button
-        measuresCollapsibleButton = ctk.ctkCollapsibleButton()
-        measuresCollapsibleButton.text = "Cardiac Agaston Measures"
-        self.layout.addWidget(measuresCollapsibleButton)
+        self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
+        self.measuresCollapsibleButton.text = "Cardiac Agaston Measures"
+        self.layout.addWidget(self.measuresCollapsibleButton)
         
         # Layout within the sample collapsible button
-        measuresFormLayout = qt.QFormLayout(measuresCollapsibleButton)
-        
+        self.measuresFormLayout = qt.QFormLayout(self.measuresCollapsibleButton)
+
+        # The Input Volume Selector
+        self.inputFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.inputFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addWidget(self.inputFrame)
+        self.inputSelector = qt.QLabel("Input Volume: ", self.inputFrame)
+        self.inputFrame.layout().addWidget(self.inputSelector)
+        self.inputSelector = slicer.qMRMLNodeComboBox(self.inputFrame)
+        self.inputSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.inputSelector.addEnabled = False
+        self.inputSelector.removeEnabled = False
+        self.inputSelector.setMRMLScene( slicer.mrmlScene )
+        self.inputFrame.layout().addWidget(self.inputSelector)
+
         # HelloWorld button
         helloWorldButton = qt.QPushButton("Hello World")
         helloWorldButton.toolTip = "Print 'Hello world' in standard output"
-        measuresFormLayout.addWidget(helloWorldButton)
+        self.measuresFormLayout.addWidget(helloWorldButton)
         helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
         
         
