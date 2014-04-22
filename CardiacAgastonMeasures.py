@@ -83,19 +83,36 @@ class CardiacAgastonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
+        # Input fiducials node selector
+        self.inputFiducialsNodeSelector = slicer.qMRMLNodeComboBox()
+        self.inputFiducialsNodeSelector.objectName = 'inputFiducialsNodeSelector'
+        self.inputFiducialsNodeSelector.toolTip = "Select a fiducial list to define control points for the path."
+        self.inputFiducialsNodeSelector.nodeTypes = ['vtkMRMLMarkupsFiducialNode', 'vtkMRMLAnnotationHierarchyNode', 'vtkMRMLFiducialListNode']
+        self.inputFiducialsNodeSelector.noneEnabled = True
+        self.inputFiducialsNodeSelector.addEnabled = True
+        self.inputFiducialsNodeSelector.removeEnabled = False
+        self.inputFiducialsNodeSelector.connect('currentNodeChanged(bool)', self.enableOrDisableCreateButton)
+        self.measuresFormLayout.addRow("Input Fiducials:", self.inputFiducialsNodeSelector)
+        self.parent.connect('mrmlSceneChanged(vtkMRMLScene*)',
+                            self.inputFiducialsNodeSelector, 'setMRMLScene(vtkMRMLScene*)')
+
         # HelloWorld button
         helloWorldButton = qt.QPushButton("Hello World")
         helloWorldButton.toolTip = "Print 'Hello world' in standard output"
         self.measuresFormLayout.addWidget(helloWorldButton)
         helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
-        
-        
+
         # Add vertical spacer
         self.layout.addStretch(1)
         
         # Set local var as instance attribute
         self.helloWorldButton = helloWorldButton
-        
+
+
+    def enableOrDisableCreateButton(self):
+        """Will be removed, just here for testing purposes"""
+        pass
+
     def onHelloWorldButtonClicked(self):
         print "Hey World !"
         qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Hello There!!!')
