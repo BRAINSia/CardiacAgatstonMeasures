@@ -73,7 +73,7 @@ class CardiacAgastonMeasuresWidget:
         # The Input Volume Selector
         self.inputFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.inputFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addWidget(self.inputFrame)
+        self.measuresFormLayout.addRow(self.inputFrame)
         self.inputSelector = qt.QLabel("Input Volume: ", self.inputFrame)
         self.inputFrame.layout().addWidget(self.inputSelector)
         self.inputSelector = slicer.qMRMLNodeComboBox(self.inputFrame)
@@ -83,44 +83,33 @@ class CardiacAgastonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
-        # Input fiducials node selector
-        self.inputFiducialsNodeSelector = slicer.qMRMLNodeComboBox()
-        self.inputFiducialsNodeSelector.objectName = 'inputFiducialsNodeSelector'
-        self.inputFiducialsNodeSelector.toolTip = "Select a fiducial list to define control points for the path."
-        self.inputFiducialsNodeSelector.nodeTypes = ['vtkMRMLMarkupsFiducialNode', 'vtkMRMLAnnotationHierarchyNode', 'vtkMRMLFiducialListNode']
-        self.inputFiducialsNodeSelector.noneEnabled = True
-        self.inputFiducialsNodeSelector.addEnabled = True
-        self.inputFiducialsNodeSelector.removeEnabled = False
-        #self.inputFiducialsNodeSelector.connect('currentNodeChanged(bool)', self.enableOrDisableCreateButton)
-        self.measuresFormLayout.addRow("Input Fiducials:", self.inputFiducialsNodeSelector)
-        #self.parent.connect('mrmlSceneChanged(vtkMRMLScene*)',self.inputFiducialsNodeSelector, 'setMRMLScene(vtkMRMLScene*)')
 
+        # The Input Good Fiducials Selector
+        self.inputGoodFiducialsSelector = slicer.qMRMLNodeComboBox()
+        self.inputGoodFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
+        self.inputGoodFiducialsSelector.toolTip = "Select a fiducial list to define the Good calcium plaques to keep."
+        self.inputGoodFiducialsSelector.objectName = "inputGoodFiducialsSelector"
+        self.inputGoodFiducialsSelector.addEnabled = False
+        self.inputGoodFiducialsSelector.removeEnabled = False
+        self.inputGoodFiducialsSelector.noneEnabled = True
+        self.inputGoodFiducialsSelector.setMRMLScene( slicer.mrmlScene )
+        self.measuresFormLayout.addRow("Input Good Fiducials: ", self.inputGoodFiducialsSelector)
 
-        # The Input Volume Selector - Test
-        self.inputFiducialsFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.inputFiducialsFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addWidget(self.inputFiducialsFrame)
-        self.inputFiducialsSelector = qt.QLabel("Input Fiducials 2: ", self.inputFiducialsFrame)
-        self.inputFiducialsFrame.layout().addWidget(self.inputFiducialsSelector)
-        self.inputFiducialsSelector = slicer.qMRMLNodeComboBox(self.inputFiducialsFrame)
-        self.inputFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
-        self.inputFiducialsSelector.addEnabled = False
-        self.inputFiducialsSelector.removeEnabled = False
-        self.inputFiducialsSelector.setMRMLScene( slicer.mrmlScene )
-        self.inputFiducialsFrame.layout().addWidget(self.inputFiducialsSelector)
-
-        # The Input Volume Selector - Test no frame
-        self.inputFiducialsSelector = slicer.qMRMLNodeComboBox()
-        self.inputFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
-        self.inputFiducialsSelector.addEnabled = False
-        self.inputFiducialsSelector.removeEnabled = False
-        self.inputFiducialsSelector.setMRMLScene( slicer.mrmlScene )
-        self.measuresFormLayout.addRow("Input Fiducials 2: ", self.inputFiducialsSelector)
+        # The Input Bad Fiducials Selector
+        self.inputBadFiducialsSelector = slicer.qMRMLNodeComboBox()
+        self.inputBadFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
+        self.inputBadFiducialsSelector.toolTip = "Select a fiducial list to define the Bed calcium plaques to remove."
+        self.inputBadFiducialsSelector.objectName = "inputBadFiducialsSelector"
+        self.inputBadFiducialsSelector.addEnabled = False
+        self.inputBadFiducialsSelector.removeEnabled = False
+        self.inputBadFiducialsSelector.noneEnabled = True
+        self.inputBadFiducialsSelector.setMRMLScene( slicer.mrmlScene )
+        self.measuresFormLayout.addRow("Input Bad Fiducials: ", self.inputBadFiducialsSelector)
 
         # HelloWorld button
         helloWorldButton = qt.QPushButton("Hello World")
         helloWorldButton.toolTip = "Print 'Hello world' in standard output"
-        self.measuresFormLayout.addWidget(helloWorldButton)
+        self.measuresFormLayout.addRow(helloWorldButton)
         helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
 
         # Add vertical spacer
