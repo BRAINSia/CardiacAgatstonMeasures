@@ -91,10 +91,31 @@ class CardiacAgastonMeasuresWidget:
         self.inputFiducialsNodeSelector.noneEnabled = True
         self.inputFiducialsNodeSelector.addEnabled = True
         self.inputFiducialsNodeSelector.removeEnabled = False
-        self.inputFiducialsNodeSelector.connect('currentNodeChanged(bool)', self.enableOrDisableCreateButton)
+        #self.inputFiducialsNodeSelector.connect('currentNodeChanged(bool)', self.enableOrDisableCreateButton)
         self.measuresFormLayout.addRow("Input Fiducials:", self.inputFiducialsNodeSelector)
-        self.parent.connect('mrmlSceneChanged(vtkMRMLScene*)',
-                            self.inputFiducialsNodeSelector, 'setMRMLScene(vtkMRMLScene*)')
+        #self.parent.connect('mrmlSceneChanged(vtkMRMLScene*)',self.inputFiducialsNodeSelector, 'setMRMLScene(vtkMRMLScene*)')
+
+
+        # The Input Volume Selector - Test
+        self.inputFiducialsFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.inputFiducialsFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addWidget(self.inputFiducialsFrame)
+        self.inputFiducialsSelector = qt.QLabel("Input Fiducials 2: ", self.inputFiducialsFrame)
+        self.inputFiducialsFrame.layout().addWidget(self.inputFiducialsSelector)
+        self.inputFiducialsSelector = slicer.qMRMLNodeComboBox(self.inputFiducialsFrame)
+        self.inputFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
+        self.inputFiducialsSelector.addEnabled = False
+        self.inputFiducialsSelector.removeEnabled = False
+        self.inputFiducialsSelector.setMRMLScene( slicer.mrmlScene )
+        self.inputFiducialsFrame.layout().addWidget(self.inputFiducialsSelector)
+
+        # The Input Volume Selector - Test no frame
+        self.inputFiducialsSelector = slicer.qMRMLNodeComboBox()
+        self.inputFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
+        self.inputFiducialsSelector.addEnabled = False
+        self.inputFiducialsSelector.removeEnabled = False
+        self.inputFiducialsSelector.setMRMLScene( slicer.mrmlScene )
+        self.measuresFormLayout.addRow("Input Fiducials 2: ", self.inputFiducialsSelector)
 
         # HelloWorld button
         helloWorldButton = qt.QPushButton("Hello World")
