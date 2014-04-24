@@ -142,6 +142,12 @@ class CardiacAgastonMeasuresWidget:
         self.RCASelector.removeEnabled = False
         self.RCASelector.setMRMLScene( slicer.mrmlScene )
         self.RCAFrame.layout().addWidget(self.RCASelector)
+
+        # Calculate Statistics Button
+        calculateButton = qt.QPushButton("Calculating Statistics")
+        calculateButton.toolTip = "Calculating Statistics"
+        self.measuresFormLayout.addRow(calculateButton)
+        calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
         
         # Add vertical spacer
         self.layout.addStretch(1)
@@ -156,6 +162,13 @@ class CardiacAgastonMeasuresWidget:
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage,'calcium')
+
+    def onCalculatedButtonClicked(self):
+        #Just temporary code, will calculate statistics and show in table
+        print "Calculating Statistics"
+        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Calculating Statistics')
+        inputVolumeName = su.PullFromSlicer(self.LMSelector.currentNode().GetName())
+        su.PushLabel(inputVolumeName,'LM-Label')
 
     def onReload(self,moduleName="CardiacAgastonMeasures"):
         """Generic reload method for any scripted module.
