@@ -170,6 +170,51 @@ class CardiacAgastonMeasuresWidget:
         inputVolumeName = su.PullFromSlicer(self.LMSelector.currentNode().GetName())
         su.PushLabel(inputVolumeName,'LM-Label')
 
+    def KEV2AgatstonIndex(self, kev):
+        AgatstonIndex = 0.0
+        if kev > 130:
+            AgatstonIndex = 1.0
+        if kev > 200:
+            AgatstonIndex = 2.0
+        if kev > 300:
+            AgatstonIndex = 3.0
+        if kev > 400:
+            AgatstonIndex = 4.0
+        return AgatstonIndex
+
+    def ComputeSlicewiseAgatstonScores(self, calcium,heart,all_labels):
+        sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
+        ##Initialize Dictionary entries with empty list
+        for label in all_labels:
+            if label == 0:
+                continue
+            sliceAgatstonPerLabel[label]=list()
+
+        ImageSpacing = calcium.GetSpacing()
+        ImageIndex=range(0,calcium.GetSize()[2])
+        for index in ImageIndex:
+            slice_calcium = calcium[:,:,index]
+            slice_img = heart[:,:,index]
+            slice_ls=sitk.LabelStatisticsImageFilter()
+            slice_ls.Execute(slice_img,slice_calcium)
+            for label in all_labels:
+                if label == 0:
+                    continue
+                AgatstonValue = 0.0
+                if slice_ls.HasLabel(label):
+                    slice_count = slice_ls.GetCount(label)
+                    slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
+                    #slice_volume = slice_area*ImageSpacing[2]
+                    #slice_mean = slice_ls.GetMean(label)
+                    slice_max = slice_ls.GetMaximum(label)
+                    #print "label: ",label," index: ",index," slice area: ", slice_area," ", slice_max, " ", KEV2AgatstonIndex( slice_max )*slice_area
+                    slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
+                    #slice_load = slice_mean
+                    AgatstonValue = slice_Agatston
+
+                sliceAgatstonPerLabel[label].append(AgatstonValue)
+        return sliceAgatstonPerLabel
+
     def onReload(self,moduleName="CardiacAgastonMeasures"):
         """Generic reload method for any scripted module.
             ModuleWizard will subsitute correct default moduleName.
