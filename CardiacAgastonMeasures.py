@@ -1,4 +1,6 @@
 from __main__ import vtk, qt, ctk, slicer
+import SimpleITK as sitk
+import sitkUtils as su
 
 #
 # CardiacAgastonMeasures
@@ -25,7 +27,7 @@ class CardiacAgastonMeasures:
 class CardiacAgastonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
-
+        self.thresholdValue = 130
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -83,6 +85,11 @@ class CardiacAgastonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
+        # Threshold button
+        thresholdButton = qt.QPushButton("Threshold Volume")
+        thresholdButton.toolTip = "Threshold the selected Input Volume"
+        self.measuresFormLayout.addRow(thresholdButton)
+        thresholdButton.connect('clicked(bool)', self.onThresholdButtonClicked)
 
         # The Input Good Fiducials Selector
         self.inputGoodFiducialsSelector = slicer.qMRMLNodeComboBox()
@@ -98,7 +105,7 @@ class CardiacAgastonMeasuresWidget:
         # The Input Bad Fiducials Selector
         self.inputBadFiducialsSelector = slicer.qMRMLNodeComboBox()
         self.inputBadFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
-        self.inputBadFiducialsSelector.toolTip = "Select a fiducial list to define the Bed calcium plaques to remove."
+        self.inputBadFiducialsSelector.toolTip = "Select a fiducial list to define the Bad calcium plaques to remove."
         self.inputBadFiducialsSelector.objectName = "inputBadFiducialsSelector"
         self.inputBadFiducialsSelector.addEnabled = False
         self.inputBadFiducialsSelector.removeEnabled = False
@@ -106,27 +113,19 @@ class CardiacAgastonMeasuresWidget:
         self.inputBadFiducialsSelector.setMRMLScene( slicer.mrmlScene )
         self.measuresFormLayout.addRow("Input Bad Fiducials: ", self.inputBadFiducialsSelector)
 
-        # HelloWorld button
-        helloWorldButton = qt.QPushButton("Hello World")
-        helloWorldButton.toolTip = "Print 'Hello world' in standard output"
-        self.measuresFormLayout.addRow(helloWorldButton)
-        helloWorldButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
-
         # Add vertical spacer
         self.layout.addStretch(1)
         
         # Set local var as instance attribute
-        self.helloWorldButton = helloWorldButton
+        self.thresholdButton = thresholdButton
 
-
-    def enableOrDisableCreateButton(self):
-        """Will be removed, just here for testing purposes"""
-        pass
-
-    def onHelloWorldButtonClicked(self):
-        print "Hey World !"
-        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Hello There!!!')
-
+    def onThresholdButtonClicked(self):
+        print "Thresholding at {0}".format(self.thresholdValue)
+        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Thresholding at {0}'.format(self.thresholdValue))
+        inputVolumeName = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
+        thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
+        castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
+        su.PushLabel(castedThresholdImage,'calcium')
 
     def onReload(self,moduleName="CardiacAgastonMeasures"):
         """Generic reload method for any scripted module.
@@ -134,6 +133,8 @@ class CardiacAgastonMeasuresWidget:
             Note: customized for use in LandmarkRegistration
             """
         import imp, sys, os, slicer
+        import SimpleITK as sitk
+        import sitkUtils as su
 
         # first, destroy the current plugin, since it will
         # contain subclasses of the RegistrationLib modules
