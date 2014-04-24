@@ -91,28 +91,58 @@ class CardiacAgastonMeasuresWidget:
         self.measuresFormLayout.addRow(thresholdButton)
         thresholdButton.connect('clicked(bool)', self.onThresholdButtonClicked)
 
-        # The Input Good Fiducials Selector
-        self.inputGoodFiducialsSelector = slicer.qMRMLNodeComboBox()
-        self.inputGoodFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
-        self.inputGoodFiducialsSelector.toolTip = "Select a fiducial list to define the Good calcium plaques to keep."
-        self.inputGoodFiducialsSelector.objectName = "inputGoodFiducialsSelector"
-        self.inputGoodFiducialsSelector.addEnabled = False
-        self.inputGoodFiducialsSelector.removeEnabled = False
-        self.inputGoodFiducialsSelector.noneEnabled = True
-        self.inputGoodFiducialsSelector.setMRMLScene( slicer.mrmlScene )
-        self.measuresFormLayout.addRow("Input Good Fiducials: ", self.inputGoodFiducialsSelector)
+        # The Input Left Main (LM) Label Selector
+        self.LMFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.LMFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.LMFrame)
+        self.LMSelector = qt.QLabel("Label - Left Main (LM):\t\t", self.LMFrame)
+        self.LMFrame.layout().addWidget(self.LMSelector)
+        self.LMSelector = slicer.qMRMLNodeComboBox(self.LMFrame)
+        self.LMSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.LMSelector.addEnabled = False
+        self.LMSelector.removeEnabled = False
+        self.LMSelector.setMRMLScene( slicer.mrmlScene )
+        self.LMFrame.layout().addWidget(self.LMSelector)
 
-        # The Input Bad Fiducials Selector
-        self.inputBadFiducialsSelector = slicer.qMRMLNodeComboBox()
-        self.inputBadFiducialsSelector.nodeTypes = ( ("vtkMRMLMarkupsFiducialNode"), "" )
-        self.inputBadFiducialsSelector.toolTip = "Select a fiducial list to define the Bad calcium plaques to remove."
-        self.inputBadFiducialsSelector.objectName = "inputBadFiducialsSelector"
-        self.inputBadFiducialsSelector.addEnabled = False
-        self.inputBadFiducialsSelector.removeEnabled = False
-        self.inputBadFiducialsSelector.noneEnabled = True
-        self.inputBadFiducialsSelector.setMRMLScene( slicer.mrmlScene )
-        self.measuresFormLayout.addRow("Input Bad Fiducials: ", self.inputBadFiducialsSelector)
+        # The Input Left Arterial Descending (LAD) Label Selector
+        self.LADFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.LADFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.LADFrame)
+        self.LADSelector = qt.QLabel("Label - Left Arterial Descending (LAD):\t", self.LADFrame)
+        self.LADFrame.layout().addWidget(self.LADSelector)
+        self.LADSelector = slicer.qMRMLNodeComboBox(self.LADFrame)
+        self.LADSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.LADSelector.addEnabled = False
+        self.LADSelector.removeEnabled = False
+        self.LADSelector.setMRMLScene( slicer.mrmlScene )
+        self.LADFrame.layout().addWidget(self.LADSelector)
 
+        # The Input Left Circumflex (LCX) Label Selector
+        self.LCXFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.LCXFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.LCXFrame)
+        self.LCXSelector = qt.QLabel("Label - Left Circumflex (LCX):\t\t", self.LCXFrame)
+        self.LCXFrame.layout().addWidget(self.LCXSelector)
+        self.LCXSelector = slicer.qMRMLNodeComboBox(self.LCXFrame)
+        self.LCXSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.LCXSelector.addEnabled = False
+        self.LCXSelector.removeEnabled = False
+        self.LCXSelector.setMRMLScene( slicer.mrmlScene )
+        self.LCXFrame.layout().addWidget(self.LCXSelector)
+
+        # The Input Left Circumflex (RCA) Label Selector
+        self.RCAFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.RCAFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.RCAFrame)
+        self.RCASelector = qt.QLabel("Label - Right Coronary Artery (RCA):\t", self.RCAFrame)
+        self.RCAFrame.layout().addWidget(self.RCASelector)
+        self.RCASelector = slicer.qMRMLNodeComboBox(self.RCAFrame)
+        self.RCASelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.RCASelector.addEnabled = False
+        self.RCASelector.removeEnabled = False
+        self.RCASelector.setMRMLScene( slicer.mrmlScene )
+        self.RCAFrame.layout().addWidget(self.RCASelector)
+        
         # Add vertical spacer
         self.layout.addStretch(1)
         
