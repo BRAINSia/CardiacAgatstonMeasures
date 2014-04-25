@@ -3,13 +3,13 @@ import SimpleITK as sitk
 import sitkUtils as su
 
 #
-# CardiacAgastonMeasures
+# CardiacAgatstonMeasures
 #
 
-class CardiacAgastonMeasures:
+class CardiacAgatstonMeasures:
     def __init__(self, parent):
-        parent.title = "Cardiac Agaston Measures"
-        parent.categories = ["Cardiac Agaston Measures"]
+        parent.title = "Cardiac Agatston Measures"
+        parent.categories = ["Cardiac Agatston Measures"]
         parent.dependencies = []
         parent.contributors = ["Jessica Forbes (SINAPSE)",
                                "Hans Johnson (SINAPSE)"]
@@ -21,10 +21,10 @@ class CardiacAgastonMeasures:
         self.parent = parent
 
 #
-# CardiacAgastonMeasuresWidget
+# CardiacAgatstonMeasuresWidget
 #
 
-class CardiacAgastonMeasuresWidget:
+class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
         self.thresholdValue = 130
@@ -58,7 +58,7 @@ class CardiacAgastonMeasuresWidget:
             #  your module to users)
             self.reloadButton = qt.QPushButton("Reload")
             self.reloadButton.toolTip = "Reload this module."
-            self.reloadButton.name = "CardiacAgastonMeasures Reload"
+            self.reloadButton.name = "CardiacAgatstonMeasures Reload"
             reloadFormLayout.addWidget(self.reloadButton)
             #self.reloadButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
             self.reloadButton.connect('clicked()', self.onReload)
@@ -66,7 +66,7 @@ class CardiacAgastonMeasuresWidget:
         
         # Collapsible button
         self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
-        self.measuresCollapsibleButton.text = "Cardiac Agaston Measures"
+        self.measuresCollapsibleButton.text = "Cardiac Agatston Measures"
         self.layout.addWidget(self.measuresCollapsibleButton)
         
         # Layout within the sample collapsible button
@@ -168,9 +168,9 @@ class CardiacAgastonMeasuresWidget:
         print "Calculating Statistics"
         qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Calculating Statistics')
         calcium = su.PullFromSlicer('calcium')
-        su.PushLabel(calcium,'calciumLabels')
+        su.PushLabel(calcium,'calciumLabels') #TODO: remove after testing
         all_labels = [0, 1, 2, 3, 4]
-        heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())#self.inputSelector.currentNode()
+        heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
         print sliceAgatstonPerLabel
 
@@ -219,7 +219,7 @@ class CardiacAgastonMeasuresWidget:
                 sliceAgatstonPerLabel[label].append(AgatstonValue)
         return sliceAgatstonPerLabel
 
-    def onReload(self,moduleName="CardiacAgastonMeasures"):
+    def onReload(self,moduleName="CardiacAgatstonMeasures"):
         """Generic reload method for any scripted module.
             ModuleWizard will subsitute correct default moduleName.
             Note: customized for use in LandmarkRegistration
