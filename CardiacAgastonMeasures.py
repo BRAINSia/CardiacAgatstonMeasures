@@ -167,8 +167,12 @@ class CardiacAgastonMeasuresWidget:
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
         qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Calculating Statistics')
-        inputVolumeName = su.PullFromSlicer(self.LMSelector.currentNode().GetName())
-        su.PushLabel(inputVolumeName,'LM-Label')
+        calcium = su.PullFromSlicer('calcium')
+        su.PushLabel(calcium,'calciumLabels')
+        all_labels = [0, 1, 2, 3, 4]
+        heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())#self.inputSelector.currentNode()
+        sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
+        print sliceAgatstonPerLabel
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
@@ -182,7 +186,7 @@ class CardiacAgastonMeasuresWidget:
             AgatstonIndex = 4.0
         return AgatstonIndex
 
-    def ComputeSlicewiseAgatstonScores(self, calcium,heart,all_labels):
+    def ComputeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
         sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
         ##Initialize Dictionary entries with empty list
         for label in all_labels:
