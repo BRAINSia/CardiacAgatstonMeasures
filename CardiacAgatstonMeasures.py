@@ -186,7 +186,14 @@ class CardiacAgatstonMeasuresWidget:
         all_labels = [0, 1, 2, 3, 4]
         heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
-        print sliceAgatstonPerLabel
+        #print sliceAgatstonPerLabel
+        print "-"*50
+        self.computeOverallAgatstonScore(sliceAgatstonPerLabel)
+        print "-"*50
+
+    def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
+        for (label, scores) in sliceAgatstonPerLabel.items():
+            print "Label", label, ": Agatston Score = ", sum(scores)
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
