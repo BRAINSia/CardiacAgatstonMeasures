@@ -204,9 +204,9 @@ class CardiacAgatstonMeasuresWidget:
                 AgatstonIndex = 1.0
             if kev >= 266:   #range = 266-407
                 AgatstonIndex = 2.0
-            if kev >= 408:   #range = 408-549
+            if kev >= 408:   #range = 408-550
                 AgatstonIndex = 3.0
-            if kev >= 550:   #range >= 550
+            if kev >= 551:   #range >= 551
                 AgatstonIndex = 4.0
         return AgatstonIndex
 
