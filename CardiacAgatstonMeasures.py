@@ -145,7 +145,17 @@ class CardiacAgatstonMeasuresWidget:
         self.RCASelector.setMRMLScene( slicer.mrmlScene )
         self.RCAFrame.layout().addWidget(self.RCASelector)
 
-        qt.QRadioButton()
+        # Radio Buttons for Selecting 80 KEV or 120 KEV
+        self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.RadioButtonsFrame)
+        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
+        self.KEV80.setToolTip("Select 80 KEV.")
+        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
+        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
+        self.KEV120.setToolTip("Select 120 KEV.")
+        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
+
         # Calculate Statistics Button
         calculateButton = qt.QPushButton("Calculate Statistics")
         calculateButton.toolTip = "Calculating Statistics"
