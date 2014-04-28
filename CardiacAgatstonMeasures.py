@@ -2,6 +2,7 @@ from __main__ import vtk, qt, ctk, slicer
 import SimpleITK as sitk
 import sitkUtils as su
 
+
 #
 # CardiacAgatstonMeasures
 #
@@ -28,6 +29,7 @@ class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
         self.thresholdValue = 130
+        self.KEV = 120
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -143,8 +145,9 @@ class CardiacAgatstonMeasuresWidget:
         self.RCASelector.setMRMLScene( slicer.mrmlScene )
         self.RCAFrame.layout().addWidget(self.RCASelector)
 
+        qt.QRadioButton()
         # Calculate Statistics Button
-        calculateButton = qt.QPushButton("Calculating Statistics")
+        calculateButton = qt.QPushButton("Calculate Statistics")
         calculateButton.toolTip = "Calculating Statistics"
         self.measuresFormLayout.addRow(calculateButton)
         calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
@@ -176,14 +179,24 @@ class CardiacAgatstonMeasuresWidget:
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
-        if kev > 130:
-            AgatstonIndex = 1.0
-        if kev > 200:
-            AgatstonIndex = 2.0
-        if kev > 300:
-            AgatstonIndex = 3.0
-        if kev > 400:
-            AgatstonIndex = 4.0
+        if self.KEV == 120:
+            if kev >= 130:   #range = 130-199
+                AgatstonIndex = 1.0
+            if kev >= 200:   #range = 200-299
+                AgatstonIndex = 2.0
+            if kev >= 300:   #range = 300-399
+                AgatstonIndex = 3.0
+            if kev >= 400:   #range >= 400
+                AgatstonIndex = 4.0
+        elif self.KEV == 80:
+            if kev >= 167:   #range = 167-265
+                AgatstonIndex = 1.0
+            if kev >= 266:   #range = 266-407
+                AgatstonIndex = 2.0
+            if kev >= 408:   #range = 408-549
+                AgatstonIndex = 3.0
+            if kev >= 550:   #range >= 550
+                AgatstonIndex = 4.0
         return AgatstonIndex
 
     def ComputeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
