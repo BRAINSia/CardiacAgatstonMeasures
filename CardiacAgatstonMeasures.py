@@ -29,7 +29,6 @@ class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
         self.thresholdValue = 130
-        self.KEV = 120
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -154,6 +153,7 @@ class CardiacAgatstonMeasuresWidget:
         self.RadioButtonsFrame.layout().addWidget(self.KEV80)
         self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
         self.KEV120.setToolTip("Select 120 KEV.")
+        self.KEV120.checked = True
         self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
         # Calculate Statistics Button
@@ -167,6 +167,7 @@ class CardiacAgatstonMeasuresWidget:
         
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
+        self.calculateButton = calculateButton
 
     def onThresholdButtonClicked(self):
         print "Thresholding at {0}".format(self.thresholdValue)
@@ -189,7 +190,7 @@ class CardiacAgatstonMeasuresWidget:
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
-        if self.KEV == 120:
+        if self.KEV120.checked:
             if kev >= 130:   #range = 130-199
                 AgatstonIndex = 1.0
             if kev >= 200:   #range = 200-299
@@ -198,7 +199,7 @@ class CardiacAgatstonMeasuresWidget:
                 AgatstonIndex = 3.0
             if kev >= 400:   #range >= 400
                 AgatstonIndex = 4.0
-        elif self.KEV == 80:
+        elif self.KEV80.checked:
             if kev >= 167:   #range = 167-265
                 AgatstonIndex = 1.0
             if kev >= 266:   #range = 266-407
