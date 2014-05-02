@@ -66,13 +66,25 @@ class CardiacAgatstonMeasuresWidget:
             self.reloadButton.connect('clicked()', self.onReload)
         
         
-        # Collapsible button
+        # Collapsible button for Input Parameters
         self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
-        self.measuresCollapsibleButton.text = "Cardiac Agatston Measures"
+        self.measuresCollapsibleButton.text = "Input Parameters"
         self.layout.addWidget(self.measuresCollapsibleButton)
+
+        # Collapsible button for Label Parameters
+        self.labelsCollapsibleButton = ctk.ctkCollapsibleButton()
+        self.labelsCollapsibleButton.text = "Label Parameters"
+        self.layout.addWidget(self.labelsCollapsibleButton)
+
+        # Collapsible button for Statistics Parameters
+        self.statisticsCollapsibleButton = ctk.ctkCollapsibleButton()
+        self.statisticsCollapsibleButton.text = "Statistics Parameters"
+        self.layout.addWidget(self.statisticsCollapsibleButton)
 
         # Layout within the sample collapsible button
         self.measuresFormLayout = qt.QFormLayout(self.measuresCollapsibleButton)
+        self.labelsFormLayout = qt.QFormLayout(self.labelsCollapsibleButton)
+        self.statisticsFormLayout = qt.QFormLayout(self.statisticsCollapsibleButton)
 
         # The Input Volume Selector
         self.inputFrame = qt.QFrame(self.measuresCollapsibleButton)
@@ -96,37 +108,37 @@ class CardiacAgatstonMeasuresWidget:
         # The Input Left Main (LM) Label Selector
         LMchangeIslandButton = qt.QPushButton("LM")
         LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
-        self.measuresFormLayout.addRow(LMchangeIslandButton)
+        self.labelsFormLayout.addRow(LMchangeIslandButton)
         LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
 
         # The Input Left Arterial Descending (LAD) Label Selector
         LADchangeIslandButton = qt.QPushButton("LAD")
         LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
-        self.measuresFormLayout.addRow(LADchangeIslandButton)
+        self.labelsFormLayout.addRow(LADchangeIslandButton)
         LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
 
         # The Input Left Circumflex (LCX) Label Selector
         LCXchangeIslandButton = qt.QPushButton("LCX")
         LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
-        self.measuresFormLayout.addRow(LCXchangeIslandButton)
+        self.labelsFormLayout.addRow(LCXchangeIslandButton)
         LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
 
         # The Input Right Coronary Artery (RCA) Label Selector
         RCAchangeIslandButton = qt.QPushButton("RCA")
         RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
-        self.measuresFormLayout.addRow(RCAchangeIslandButton)
+        self.labelsFormLayout.addRow(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
         # Quit Label Changer (LX, LAD, LCX, RCA) Button
         quitLabelChanger = qt.QPushButton("Quit Label Changer (LX, LAD, LCX, RCA)")
         quitLabelChanger.toolTip = "Click to stop any of the change label buttons"
-        self.measuresFormLayout.addRow(quitLabelChanger)
+        self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
 
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.RadioButtonsFrame)
+        self.statisticsFormLayout.addRow(self.RadioButtonsFrame)
         self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
         self.KEV80.setToolTip("Select 80 KEV.")
         self.RadioButtonsFrame.layout().addWidget(self.KEV80)
@@ -138,7 +150,7 @@ class CardiacAgatstonMeasuresWidget:
         # Calculate Statistics Button
         calculateButton = qt.QPushButton("Calculate Statistics")
         calculateButton.toolTip = "Calculating Statistics"
-        self.measuresFormLayout.addRow(calculateButton)
+        self.statisticsFormLayout.addRow(calculateButton)
         calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
 
         #EditorLib.EditBox()
@@ -195,9 +207,8 @@ class CardiacAgatstonMeasuresWidget:
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
-        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Calculating Statistics')
         calcium = su.PullFromSlicer('calcium')
-        all_labels = [0, 1, 2, 3, 4]
+        all_labels = [0, 1, 2, 3, 4, 5]
         heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
         #print sliceAgatstonPerLabel
@@ -247,7 +258,7 @@ class CardiacAgatstonMeasuresWidget:
             slice_ls=sitk.LabelStatisticsImageFilter()
             slice_ls.Execute(slice_img,slice_calcium)
             for label in all_labels:
-                if label == 0:
+                if label == 0 or label == 5:
                     continue
                 AgatstonValue = 0.0
                 if slice_ls.HasLabel(label):
@@ -272,6 +283,7 @@ class CardiacAgatstonMeasuresWidget:
         import imp, sys, os, slicer
         import SimpleITK as sitk
         import sitkUtils as su
+        import EditorLib
 
         # first, destroy the current plugin, since it will
         # contain subclasses of the RegistrationLib modules
