@@ -1,7 +1,7 @@
 from __main__ import vtk, qt, ctk, slicer
 import SimpleITK as sitk
 import sitkUtils as su
-
+import EditorLib
 
 #
 # CardiacAgatstonMeasures
@@ -93,56 +93,28 @@ class CardiacAgatstonMeasuresWidget:
         thresholdButton.connect('clicked(bool)', self.onThresholdButtonClicked)
 
         # The Input Left Main (LM) Label Selector
-        self.LMFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.LMFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.LMFrame)
-        self.LMSelector = qt.QLabel("Label - Left Main (LM):\t\t", self.LMFrame)
-        self.LMFrame.layout().addWidget(self.LMSelector)
-        self.LMSelector = slicer.qMRMLNodeComboBox(self.LMFrame)
-        self.LMSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.LMSelector.addEnabled = False
-        self.LMSelector.removeEnabled = False
-        self.LMSelector.setMRMLScene( slicer.mrmlScene )
-        self.LMFrame.layout().addWidget(self.LMSelector)
+        LMchangeIslandButton = qt.QPushButton("LM")
+        LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
+        self.measuresFormLayout.addRow(LMchangeIslandButton)
+        LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
 
         # The Input Left Arterial Descending (LAD) Label Selector
-        self.LADFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.LADFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.LADFrame)
-        self.LADSelector = qt.QLabel("Label - Left Arterial Descending (LAD):\t", self.LADFrame)
-        self.LADFrame.layout().addWidget(self.LADSelector)
-        self.LADSelector = slicer.qMRMLNodeComboBox(self.LADFrame)
-        self.LADSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.LADSelector.addEnabled = False
-        self.LADSelector.removeEnabled = False
-        self.LADSelector.setMRMLScene( slicer.mrmlScene )
-        self.LADFrame.layout().addWidget(self.LADSelector)
+        LADchangeIslandButton = qt.QPushButton("LAD")
+        LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
+        self.measuresFormLayout.addRow(LADchangeIslandButton)
+        LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
 
         # The Input Left Circumflex (LCX) Label Selector
-        self.LCXFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.LCXFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.LCXFrame)
-        self.LCXSelector = qt.QLabel("Label - Left Circumflex (LCX):\t\t", self.LCXFrame)
-        self.LCXFrame.layout().addWidget(self.LCXSelector)
-        self.LCXSelector = slicer.qMRMLNodeComboBox(self.LCXFrame)
-        self.LCXSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.LCXSelector.addEnabled = False
-        self.LCXSelector.removeEnabled = False
-        self.LCXSelector.setMRMLScene( slicer.mrmlScene )
-        self.LCXFrame.layout().addWidget(self.LCXSelector)
+        LCXchangeIslandButton = qt.QPushButton("LCX")
+        LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
+        self.measuresFormLayout.addRow(LCXchangeIslandButton)
+        LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
 
-        # The Input Left Circumflex (RCA) Label Selector
-        self.RCAFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.RCAFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.RCAFrame)
-        self.RCASelector = qt.QLabel("Label - Right Coronary Artery (RCA):\t", self.RCAFrame)
-        self.RCAFrame.layout().addWidget(self.RCASelector)
-        self.RCASelector = slicer.qMRMLNodeComboBox(self.RCAFrame)
-        self.RCASelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.RCASelector.addEnabled = False
-        self.RCASelector.removeEnabled = False
-        self.RCASelector.setMRMLScene( slicer.mrmlScene )
-        self.RCAFrame.layout().addWidget(self.RCASelector)
+        # The Input Right Coronary Artery (RCA) Label Selector
+        RCAchangeIslandButton = qt.QPushButton("RCA")
+        RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
+        self.measuresFormLayout.addRow(RCAchangeIslandButton)
+        RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
@@ -161,13 +133,45 @@ class CardiacAgatstonMeasuresWidget:
         calculateButton.toolTip = "Calculating Statistics"
         self.measuresFormLayout.addRow(calculateButton)
         calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
-        
+
+        #EditorLib.EditBox()
         # Add vertical spacer
         self.layout.addStretch(1)
         
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
         self.calculateButton = calculateButton
+        self.LMchangeIslandButton = LMchangeIslandButton
+        self.LADchangeIslandButton = LADchangeIslandButton
+        self.LCXchangeIslandButton = LCXchangeIslandButton
+        self.RCAchangeIslandButton = RCAchangeIslandButton
+
+    def onLMchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(1)
+
+    def onLADchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(2)
+
+    def onLCXchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(3)
+
+    def onRCAchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(4)
+
+    def changeIslandButtonClicked(self, label):
+        print 'onChangeIslandButtonClicked'
+        # selectionNode = slicer.app.applicationLogic().GetSelectionNode()
+        # selectionNode.SetReferenceActiveVolumeID(
+        lm = slicer.app.layoutManager()
+        changeIslandOptions = EditorLib.ChangeIslandEffectOptions()
+        changeIslandOptions.setMRMLDefaults()
+        changeIslandOptions.__del__()
+        sliceWidget = lm.sliceWidget('Red')
+        editUtil = EditorLib.EditUtil.EditUtil()
+        editUtil.setLabel(label)
+        changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
+        #changeIslandTool.cleanup()
+        #changeIslandTool = None
 
     def onThresholdButtonClicked(self):
         print "Thresholding at {0}".format(self.thresholdValue)
@@ -175,7 +179,8 @@ class CardiacAgatstonMeasuresWidget:
         inputVolumeName = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
-        su.PushLabel(castedThresholdImage,'calcium')
+        #resampledThresholdImage = sitk.Resample(castedThresholdImage, inputVolumeName)
+        su.PushLabel(castedThresholdImage*5,'calcium')
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
