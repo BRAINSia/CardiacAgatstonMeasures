@@ -29,6 +29,7 @@ class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
         self.thresholdValue = 130
+        self.changeIslandTool = None
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -69,7 +70,7 @@ class CardiacAgatstonMeasuresWidget:
         self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
         self.measuresCollapsibleButton.text = "Cardiac Agatston Measures"
         self.layout.addWidget(self.measuresCollapsibleButton)
-        
+
         # Layout within the sample collapsible button
         self.measuresFormLayout = qt.QFormLayout(self.measuresCollapsibleButton)
 
@@ -116,6 +117,12 @@ class CardiacAgatstonMeasuresWidget:
         self.measuresFormLayout.addRow(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
+        # Quit Label Changer (LX, LAD, LCX, RCA) Button
+        quitLabelChanger = qt.QPushButton("Quit Label Changer (LX, LAD, LCX, RCA)")
+        quitLabelChanger.toolTip = "Click to stop any of the change label buttons"
+        self.measuresFormLayout.addRow(quitLabelChanger)
+        quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
+
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
@@ -145,6 +152,7 @@ class CardiacAgatstonMeasuresWidget:
         self.LADchangeIslandButton = LADchangeIslandButton
         self.LCXchangeIslandButton = LCXchangeIslandButton
         self.RCAchangeIslandButton = RCAchangeIslandButton
+        self.quitLabelChanger = quitLabelChanger
 
     def onLMchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(1)
@@ -159,7 +167,6 @@ class CardiacAgatstonMeasuresWidget:
         self.changeIslandButtonClicked(4)
 
     def changeIslandButtonClicked(self, label):
-        print 'onChangeIslandButtonClicked'
         # selectionNode = slicer.app.applicationLogic().GetSelectionNode()
         # selectionNode.SetReferenceActiveVolumeID(
         lm = slicer.app.layoutManager()
@@ -169,9 +176,12 @@ class CardiacAgatstonMeasuresWidget:
         sliceWidget = lm.sliceWidget('Red')
         editUtil = EditorLib.EditUtil.EditUtil()
         editUtil.setLabel(label)
-        changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
-        #changeIslandTool.cleanup()
-        #changeIslandTool = None
+        self.changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
+
+    def onQuitLabelChangerClicked(self):
+        print 'onQuitLabelChangerClicked'
+        self.changeIslandTool.cleanup()
+        self.changeIslandTool = None
 
     def onThresholdButtonClicked(self):
         print "Thresholding at {0}".format(self.thresholdValue)
@@ -187,7 +197,6 @@ class CardiacAgatstonMeasuresWidget:
         print "Calculating Statistics"
         qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Calculating Statistics')
         calcium = su.PullFromSlicer('calcium')
-        su.PushLabel(calcium,'calciumLabels') #TODO: remove after testing
         all_labels = [0, 1, 2, 3, 4]
         heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
