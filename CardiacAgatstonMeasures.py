@@ -136,6 +136,8 @@ class CardiacAgatstonMeasuresWidget:
         self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
 
+        localEditBox = EditorLib.EditBox(parent=self.parent)
+
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
@@ -171,16 +173,16 @@ class CardiacAgatstonMeasuresWidget:
         self.quitLabelChanger = quitLabelChanger
 
     def onLMchangeIslandButtonClicked(self):
-        self.changeIslandButtonClicked(1)
-
-    def onLADchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(2)
 
-    def onLCXchangeIslandButtonClicked(self):
+    def onLADchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(3)
 
-    def onRCAchangeIslandButtonClicked(self):
+    def onLCXchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(4)
+
+    def onRCAchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(5)
 
     def changeIslandButtonClicked(self, label):
         lm = slicer.app.layoutManager()
