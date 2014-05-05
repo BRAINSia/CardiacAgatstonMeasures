@@ -2,6 +2,7 @@ from __main__ import vtk, qt, ctk, slicer
 import SimpleITK as sitk
 import sitkUtils as su
 import EditorLib
+import LabelStatistics
 
 #
 # CardiacAgatstonMeasures
@@ -147,6 +148,10 @@ class CardiacAgatstonMeasuresWidget:
         self.KEV120.checked = True
         self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
+        # Adds Label Statistics Widget to Module
+        localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
+        localLabelStatisticsWidget.setup()
+
         # Calculate Statistics Button
         calculateButton = qt.QPushButton("Calculate Statistics")
         calculateButton.toolTip = "Calculating Statistics"
@@ -179,8 +184,6 @@ class CardiacAgatstonMeasuresWidget:
         self.changeIslandButtonClicked(4)
 
     def changeIslandButtonClicked(self, label):
-        # selectionNode = slicer.app.applicationLogic().GetSelectionNode()
-        # selectionNode.SetReferenceActiveVolumeID(
         lm = slicer.app.layoutManager()
         changeIslandOptions = EditorLib.ChangeIslandEffectOptions()
         changeIslandOptions.setMRMLDefaults()
@@ -189,20 +192,32 @@ class CardiacAgatstonMeasuresWidget:
         editUtil = EditorLib.EditUtil.EditUtil()
         editUtil.setLabel(label)
         self.changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
+        self.changeIslandTool.processEvent()
+        #self.changeIslandTool.cleanup()
+        #changeIslandOptions.destroy()
 
     def onQuitLabelChangerClicked(self):
         print 'onQuitLabelChangerClicked'
+        print self.changeIslandTool
         self.changeIslandTool.cleanup()
+        changeIslandOptions = EditorLib.ChangeIslandEffectOptions()
+        changeIslandOptions.destroy()
         self.changeIslandTool = None
 
     def onThresholdButtonClicked(self):
         print "Thresholding at {0}".format(self.thresholdValue)
-        qt.QMessageBox.information( slicer.util.mainWindow(), 'Slicer Python', 'Thresholding at {0}'.format(self.thresholdValue))
         inputVolumeName = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         #resampledThresholdImage = sitk.Resample(castedThresholdImage, inputVolumeName)
-        su.PushLabel(castedThresholdImage*5,'calcium')
+        # volumesLogic = slicer.modules.volumes.logic()
+
+        su.PushLabel(castedThresholdImage,'calcium')
+        # calcium = slicer.mrmlScene.GetNodesByName('calcium')
+        # volumesLogic.SetVolumeAsLabelMap(getNode('calcium'), castedThresholdImage)
+        # selectionNode = slicer.app.applicationLogic().GetSelectionNode()
+
+        # selectionNode.SetReferenceActiveLabelVolumeID( calcium.GetID() )
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
@@ -359,3 +374,99 @@ class CardiacAgatstonMeasuresWidget:
         globals()[widgetName.lower()].setup()
         setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
 
+class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
+
+    def setup(self):
+        #
+        # the grayscale volume selector
+        #
+        self.grayscaleSelectorFrame = qt.QFrame(self.parent)
+        self.grayscaleSelectorFrame.setLayout(qt.QHBoxLayout())
+        self.parent.layout().addWidget(self.grayscaleSelectorFrame)
+
+        self.grayscaleSelectorLabel = qt.QLabel("Grayscale Volume: ", self.grayscaleSelectorFrame)
+        self.grayscaleSelectorLabel.setToolTip( "Select the grayscale volume (background grayscale scalar volume node) for statistics calculations")
+        self.grayscaleSelectorFrame.layout().addWidget(self.grayscaleSelectorLabel)
+
+        self.grayscaleSelector = slicer.qMRMLNodeComboBox(self.grayscaleSelectorFrame)
+        self.grayscaleSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
+        self.grayscaleSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 0 )
+        self.grayscaleSelector.selectNodeUponCreation = False
+        self.grayscaleSelector.addEnabled = False
+        self.grayscaleSelector.removeEnabled = False
+        self.grayscaleSelector.noneEnabled = True
+        self.grayscaleSelector.showHidden = False
+        self.grayscaleSelector.showChildNodeTypes = False
+        self.grayscaleSelector.setMRMLScene( slicer.mrmlScene )
+        # TODO: need to add a QLabel
+        # self.grayscaleSelector.SetLabelText( "Master Volume:" )
+        self.grayscaleSelectorFrame.layout().addWidget(self.grayscaleSelector)
+
+        #
+        # the label volume selector
+        #
+        self.labelSelectorFrame = qt.QFrame()
+        self.labelSelectorFrame.setLayout( qt.QHBoxLayout() )
+        self.parent.layout().addWidget( self.labelSelectorFrame )
+
+        self.labelSelectorLabel = qt.QLabel()
+        self.labelSelectorLabel.setText( "Label Map: " )
+        self.labelSelectorFrame.layout().addWidget( self.labelSelectorLabel )
+
+        self.labelSelector = slicer.qMRMLNodeComboBox()
+        self.labelSelector.nodeTypes = ( "vtkMRMLScalarVolumeNode", "" )
+        self.labelSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", "1" )
+        # todo addAttribute
+        self.labelSelector.selectNodeUponCreation = False
+        self.labelSelector.addEnabled = False
+        self.labelSelector.noneEnabled = True
+        self.labelSelector.removeEnabled = False
+        self.labelSelector.showHidden = False
+        self.labelSelector.showChildNodeTypes = False
+        self.labelSelector.setMRMLScene( slicer.mrmlScene )
+        self.labelSelector.setToolTip( "Pick the label map to edit" )
+        self.labelSelectorFrame.layout().addWidget( self.labelSelector )
+
+        # Apply button
+        self.applyButton = qt.QPushButton("Apply")
+        self.applyButton.toolTip = "Calculate Statistics."
+        self.applyButton.enabled = False
+        self.parent.layout().addWidget(self.applyButton)
+
+        # model and view for stats table
+        self.view = qt.QTableView()
+        self.view.sortingEnabled = True
+        self.parent.layout().addWidget(self.view)
+
+        # Chart button
+        self.chartFrame = qt.QFrame()
+        self.chartFrame.setLayout(qt.QHBoxLayout())
+        self.parent.layout().addWidget(self.chartFrame)
+        self.chartButton = qt.QPushButton("Chart")
+        self.chartButton.toolTip = "Make a chart from the current statistics."
+        self.chartFrame.layout().addWidget(self.chartButton)
+        self.chartOption = qt.QComboBox()
+        self.chartOption.addItems(self.chartOptions)
+        self.chartFrame.layout().addWidget(self.chartOption)
+        self.chartIgnoreZero = qt.QCheckBox()
+        self.chartIgnoreZero.setText('Ignore Zero')
+        self.chartIgnoreZero.checked = False
+        self.chartIgnoreZero.setToolTip('Do not include the zero index in the chart to avoid dwarfing other bars')
+        self.chartFrame.layout().addWidget(self.chartIgnoreZero)
+        self.chartFrame.enabled = False
+
+        # Save button
+        self.saveButton = qt.QPushButton("Save")
+        self.saveButton.toolTip = "Calculate Statistics."
+        self.saveButton.enabled = False
+        self.parent.layout().addWidget(self.saveButton)
+
+        # Add vertical spacer
+        self.parent.layout().addStretch(1)
+
+        # connections
+        self.applyButton.connect('clicked()', self.onApply)
+        self.chartButton.connect('clicked()', self.onChart)
+        self.saveButton.connect('clicked()', self.onSave)
+        self.grayscaleSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onGrayscaleSelect)
+        self.labelSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onLabelSelect)
