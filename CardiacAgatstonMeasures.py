@@ -158,7 +158,6 @@ class CardiacAgatstonMeasuresWidget:
         self.statisticsFormLayout.addRow(calculateButton)
         calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
 
-        #EditorLib.EditBox()
         # Add vertical spacer
         self.layout.addStretch(1)
         
@@ -193,8 +192,6 @@ class CardiacAgatstonMeasuresWidget:
         editUtil.setLabel(label)
         self.changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
         self.changeIslandTool.processEvent()
-        #self.changeIslandTool.cleanup()
-        #changeIslandOptions.destroy()
 
     def onQuitLabelChangerClicked(self):
         print 'onQuitLabelChangerClicked'
@@ -209,15 +206,7 @@ class CardiacAgatstonMeasuresWidget:
         inputVolumeName = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
-        #resampledThresholdImage = sitk.Resample(castedThresholdImage, inputVolumeName)
-        # volumesLogic = slicer.modules.volumes.logic()
-
         su.PushLabel(castedThresholdImage,'calcium')
-        # calcium = slicer.mrmlScene.GetNodesByName('calcium')
-        # volumesLogic.SetVolumeAsLabelMap(getNode('calcium'), castedThresholdImage)
-        # selectionNode = slicer.app.applicationLogic().GetSelectionNode()
-
-        # selectionNode.SetReferenceActiveLabelVolumeID( calcium.GetID() )
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
