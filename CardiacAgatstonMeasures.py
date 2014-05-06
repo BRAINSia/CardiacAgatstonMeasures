@@ -2,6 +2,7 @@ from __main__ import vtk, qt, ctk, slicer
 import SimpleITK as sitk
 import sitkUtils as su
 import EditorLib
+import Editor
 import LabelStatistics
 
 #
@@ -136,7 +137,11 @@ class CardiacAgatstonMeasuresWidget:
         self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
 
-        localEditBox = EditorLib.EditBox(parent=self.parent)
+        # localEditBox = CardiacEditBox(parent=self.parent)
+        # localEditorWidget = Editor.EditorWidget(parent=self.parent)
+        # localEditorWidget.setup()
+        localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent)
+        localCardiacEditorWidget.setup()
 
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
@@ -151,8 +156,8 @@ class CardiacAgatstonMeasuresWidget:
         self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
         # Adds Label Statistics Widget to Module
-        localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
-        localLabelStatisticsWidget.setup()
+        # localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
+        # localLabelStatisticsWidget.setup()
 
         # Calculate Statistics Button
         calculateButton = qt.QPushButton("Calculate Statistics")
@@ -461,3 +466,63 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.saveButton.connect('clicked()', self.onSave)
         self.grayscaleSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onGrayscaleSelect)
         self.labelSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onLabelSelect)
+
+class CardiacEditorWidget(Editor.EditorWidget):
+    def createEditBox(self):
+        self.editBoxFrame = qt.QFrame(self.effectsToolsFrame)
+        self.editBoxFrame.objectName = 'EditBoxFrame'
+        self.editBoxFrame.setLayout(qt.QVBoxLayout())
+        self.effectsToolsFrame.layout().addWidget(self.editBoxFrame)
+        self.toolsBox = CardiacEditBox(self.editBoxFrame, optionsFrame=self.effectOptionsFrame)
+
+class CardiacEditBox(EditorLib.EditBox):
+    # create the edit box
+    def create(self):
+
+        self.findEffects()
+
+        self.mainFrame = qt.QFrame(self.parent)
+        self.mainFrame.objectName = 'MainFrame'
+        vbox = qt.QVBoxLayout()
+        self.mainFrame.setLayout(vbox)
+        self.parent.layout().addWidget(self.mainFrame)
+
+        #
+        # the buttons
+        #
+        self.rowFrames = []
+        self.actions = {}
+        self.buttons = {}
+        self.icons = {}
+        self.callbacks = {}
+
+        # create all of the buttons
+        # createButtonRow() ensures that only effects in self.effects are exposed,
+        # self.createButtonRow( ("DefaultTool", "EraseLabel", "PaintEffect", "DrawEffect", "WandEffect", "LevelTracingEffect", "RectangleEffect", "IdentifyIslandsEffect", "ChangeIslandEffect", "RemoveIslandsEffect", "SaveIslandEffect") )
+        self.createButtonRow( ("ErodeEffect", "DilateEffect", "GrowCutEffect", "WatershedFromMarkerEffect", "ThresholdEffect", "ChangeLabelEffect", "MakeModelEffect", "FastMarchingEffect") )
+
+        extensions = []
+        for k in slicer.modules.editorExtensions:
+          extensions.append(k)
+        self.createButtonRow( extensions )
+
+        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
+
+        #
+        # the labels
+        #
+        self.toolsActiveToolFrame = qt.QFrame(self.parent)
+        self.toolsActiveToolFrame.setLayout(qt.QHBoxLayout())
+        self.parent.layout().addWidget(self.toolsActiveToolFrame)
+        self.toolsActiveTool = qt.QLabel(self.toolsActiveToolFrame)
+        self.toolsActiveTool.setText( 'Active Tool:' )
+        self.toolsActiveTool.setStyleSheet("background-color: rgb(232,230,235)")
+        self.toolsActiveToolFrame.layout().addWidget(self.toolsActiveTool)
+        self.toolsActiveToolName = qt.QLabel(self.toolsActiveToolFrame)
+        self.toolsActiveToolName.setText( '' )
+        self.toolsActiveToolName.setStyleSheet("background-color: rgb(232,230,235)")
+        self.toolsActiveToolFrame.layout().addWidget(self.toolsActiveToolName)
+
+        vbox.addStretch(1)
+
+        self.updateUndoRedoButtons()
