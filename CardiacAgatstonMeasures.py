@@ -32,6 +32,7 @@ class CardiacAgatstonMeasuresWidget:
         self.currentRegistrationInterface = None
         self.thresholdValue = 130
         self.changeIslandTool = None
+        self.editUtil = EditorLib.EditUtil.EditUtil()
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -195,8 +196,7 @@ class CardiacAgatstonMeasuresWidget:
         changeIslandOptions.setMRMLDefaults()
         changeIslandOptions.__del__()
         sliceWidget = lm.sliceWidget('Red')
-        editUtil = EditorLib.EditUtil.EditUtil()
-        editUtil.setLabel(label)
+        self.editUtil.setLabel(label)
         self.changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
         self.changeIslandTool.processEvent()
 
@@ -214,6 +214,10 @@ class CardiacAgatstonMeasuresWidget:
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage,'calcium')
+        colorNode = self.editUtil.getColorNode()
+        cardiacLUT = slicer.util.getNode('cardiacLUT')
+        cardiacLutTable = cardiacLUT.GetLookupTable()
+        colorNode.SetLookupTable(cardiacLutTable)
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
