@@ -33,6 +33,7 @@ class CardiacAgatstonMeasuresWidget:
         self.thresholdValue = 130
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
+
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
@@ -43,6 +44,9 @@ class CardiacAgatstonMeasuresWidget:
         if not parent:
             self.setup()
             self.parent.show()
+
+        # imports custom Slicer lookup color table file
+        slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
 
     def setup(self):
         # Instantiate and connect widgets ...
@@ -67,8 +71,7 @@ class CardiacAgatstonMeasuresWidget:
             reloadFormLayout.addWidget(self.reloadButton)
             #self.reloadButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
             self.reloadButton.connect('clicked()', self.onReload)
-        
-        
+
         # Collapsible button for Input Parameters
         self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
         self.measuresCollapsibleButton.text = "Input Parameters"
