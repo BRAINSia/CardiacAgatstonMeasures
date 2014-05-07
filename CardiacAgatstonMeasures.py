@@ -230,6 +230,13 @@ class CardiacAgatstonMeasuresWidget:
         # cardiacLutTable = cardiacLUT.GetLookupTable()
         # colorNode.SetLookupTable(cardiacLutTable)
 
+                #
+        # calciumNode = slicer.util.getNode('calcium')
+        # cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        # cardiacLutID = cardiacLutNode.GetID()
+        # calciumDisplayNode = calciumNode.GetDisplayNode()
+        # calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
+
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
