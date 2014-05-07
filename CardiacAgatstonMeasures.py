@@ -141,11 +141,6 @@ class CardiacAgatstonMeasuresWidget:
         self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
 
-        # localEditBox = CardiacEditBox(parent=self.parent)
-        # localEditorWidget = Editor.EditorWidget(parent=self.parent)
-        # localEditorWidget.setup()
-
-
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
@@ -489,78 +484,8 @@ class CardiacEditorWidget(Editor.EditorWidget):
         self.effectsToolsFrame.layout().addWidget(self.editBoxFrame)
         self.toolsBox = CardiacEditBox(self.editBoxFrame, optionsFrame=self.effectOptionsFrame)
 
-    # sets up the widget
-    def setup(self):
-
-        if slicer.app.commandOptions().noMainWindow:
-            # don't build the widget if there's no place to put it
-            return
-
-        #
-        # Editor Volumes
-        #
-        # only if showing volumes
-        if self.showVolumesFrame:
-            self.volumes = ctk.ctkCollapsibleButton(self.parent)
-            self.volumes.objectName = 'VolumeCollapsibleButton'
-            self.volumes.setLayout(qt.QVBoxLayout())
-            self.volumes.setText("Create and Select Label Maps")
-            self.layout.addWidget(self.volumes)
-        else:
-            self.volumes = None
-
-        # create the helper box - note this isn't a Qt widget
-        #  but a helper class that creates Qt widgets in the given parent
-        if self.showVolumesFrame:
-            self.helper = CardiacHelperBox(self.volumes)
-        else:
-            self.helper = None
-
-        #
-        # Tool Frame
-        #
-
-        # (we already have self.parent for the parent widget, and self.layout for the layout)
-        # create the frames for the EditColor, toolsOptionsFrame and EditBox
-
-        # create collapsible button for entire "edit label maps" section
-        self.editLabelMapsFrame = ctk.ctkCollapsibleButton(self.parent)
-        self.editLabelMapsFrame.objectName = 'EditLabelMapsFrame'
-        self.editLabelMapsFrame.setLayout(qt.QVBoxLayout())
-        self.editLabelMapsFrame.setText("Edit Selected Label Map")
-        self.layout.addWidget(self.editLabelMapsFrame)
-        self.editLabelMapsFrame.collapsed = True
-
-        # create frame holding both the effect options and edit box:
-        self.effectsToolsFrame = qt.QFrame(self.editLabelMapsFrame)
-        self.effectsToolsFrame.objectName = 'EffectsToolsFrame'
-        self.effectsToolsFrame.setLayout(qt.QHBoxLayout())
-        self.editLabelMapsFrame.layout().addStretch(1)
-        self.editLabelMapsFrame.layout().addWidget(self.effectsToolsFrame)
-
-        # create frame for effect options
-        self.createEffectOptionsFrame()
-
-        # create and add frame for EditBox
-        self.createEditBox()
-
-        # create and add EditColor directly to "edit label map" section
-        self.toolsColor = EditorLib.EditColor(self.editLabelMapsFrame)
-
-        # put the tool options below the color selector
-        self.editLabelMapsFrame.layout().addWidget(self.effectOptionsFrame)
-
-        if self.helper:
-            # add a callback to collapse/open the frame based on the validity of the label volume
-            self.helper.mergeValidCommand = self.updateLabelFrame
-            # add a callback to reset the tool when a new volume is selected
-            self.helper.selectCommand = self.toolsBox.defaultEffect
-
-
-        # Add spacer to layout
-        self.layout.addStretch(1)
-
 class CardiacEditBox(EditorLib.EditBox):
+
     # create the edit box
     def create(self):
 
@@ -610,91 +535,3 @@ class CardiacEditBox(EditorLib.EditBox):
         vbox.addStretch(1)
 
         self.updateUndoRedoButtons()
-
-
-class CardiacHelperBox(EditorLib.HelperBox):
-
-    def edit(self,label):
-        """select the picked label for editing"""
-
-        merge = self.mergeVolume()
-        print "&"*50
-        print merge
-        if not merge:
-            print "****Not Merge******"
-            return
-        colorNode = merge.GetDisplayNode().GetColorNode()
-
-        structureName = colorNode.GetColorName( label )
-        structureVolume = self.structureVolume( structureName )
-
-        # make the master node the active background, and the structure label node the active label
-        selectionNode = self.applicationLogic.GetSelectionNode()
-        selectionNode.SetReferenceActiveVolumeID(self.master.GetID())
-        if structureVolume:
-            selectionNode.SetReferenceActiveLabelVolumeID( structureVolume.GetID() )
-        self.applicationLogic.PropagateVolumeSelection(0)
-
-    def create(self):
-        """create the segmentation helper box"""
-
-        #
-        # Master Frame
-        #
-        self.masterFrame = qt.QFrame(self.parent)
-        self.masterFrame.setLayout(qt.QVBoxLayout())
-        self.parent.layout().addWidget(self.masterFrame)
-
-        #
-        # the master volume selector
-        #
-        self.masterSelectorFrame = qt.QFrame(self.parent)
-        self.masterSelectorFrame.objectName = 'MasterVolumeFrame'
-        self.masterSelectorFrame.setLayout(qt.QHBoxLayout())
-        self.masterFrame.layout().addWidget(self.masterSelectorFrame)
-
-        self.masterSelectorLabel = qt.QLabel("Master Volume: ", self.masterSelectorFrame)
-        self.masterSelectorLabel.setToolTip( "Select the master volume (background grayscale scalar volume node)")
-        self.masterSelectorFrame.layout().addWidget(self.masterSelectorLabel)
-
-        self.masterSelector = slicer.qMRMLNodeComboBox(self.masterSelectorFrame)
-        self.masterSelector.objectName = 'MasterVolumeNodeSelector'
-        # TODO
-        self.masterSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.masterSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 0 )
-        self.masterSelector.selectNodeUponCreation = False
-        self.masterSelector.addEnabled = False
-        self.masterSelector.removeEnabled = False
-        self.masterSelector.noneEnabled = True
-        self.masterSelector.showHidden = False
-        self.masterSelector.showChildNodeTypes = False
-        self.masterSelector.setMRMLScene( slicer.mrmlScene )
-        # TODO: need to add a QLabel
-        # self.masterSelector.SetLabelText( "Master Volume:" )
-        self.masterSelector.setToolTip( "Pick the master structural volume to define the segmentation.  A label volume with the with \"-label\" appended to the name will be created if it doesn't already exist." )
-        self.masterSelectorFrame.layout().addWidget(self.masterSelector)
-
-        #
-        # merge label name and set button
-        #
-        self.mergeFrame = qt.QFrame(self.masterFrame)
-        self.mergeFrame.objectName = 'MergeVolumeFrame'
-        self.mergeFrame.setLayout(qt.QHBoxLayout())
-        self.masterFrame.layout().addWidget(self.mergeFrame)
-
-        mergeNameToolTip = "Composite label map containing the merged structures (be aware that merge operations will overwrite any edits applied to this volume)"
-        self.mergeNameLabel = qt.QLabel("Merge Volume: ", self.mergeFrame)
-        self.mergeNameLabel.setToolTip( mergeNameToolTip )
-        self.mergeFrame.layout().addWidget(self.mergeNameLabel)
-
-        self.mergeName = qt.QLabel("", self.mergeFrame)
-        self.mergeName.setToolTip( mergeNameToolTip )
-        self.mergeFrame.layout().addWidget(self.mergeName)
-
-        self.setMergeButton = qt.QPushButton("Set...", self.mergeFrame)
-        self.setMergeButton.objectName = 'MergeVolumeButton'
-        self.setMergeButton.setToolTip( "Set the merge volume to use with this master." )
-        self.mergeFrame.layout().addWidget(self.setMergeButton)
-
-        # so buttons will initially be disabled
-        self.master = None
