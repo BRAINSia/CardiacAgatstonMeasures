@@ -236,8 +236,13 @@ class CardiacAgatstonMeasuresWidget:
         print "-"*50
 
     def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
+        AgatstonScoresPerLabel = list()
         for (label, scores) in sliceAgatstonPerLabel.items():
-            print "Label", label, ": Agatston Score = ", sum(scores)
+            labelScore =  sum(scores)
+            print "Label", label, ": Agatston Score = ", labelScore
+            AgatstonScoresPerLabel.append(labelScore)
+        print
+        print "TOTAL Agatston Score = ", sum(AgatstonScoresPerLabel)
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
@@ -265,7 +270,7 @@ class CardiacAgatstonMeasuresWidget:
         sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
         ##Initialize Dictionary entries with empty list
         for label in all_labels:
-            if label == 0:
+            if label == 0 or label == 1:
                 continue
             sliceAgatstonPerLabel[label]=list()
 
@@ -277,7 +282,7 @@ class CardiacAgatstonMeasuresWidget:
             slice_ls=sitk.LabelStatisticsImageFilter()
             slice_ls.Execute(slice_img,slice_calcium)
             for label in all_labels:
-                if label == 0 or label == 5:
+                if label == 0 or label == 1:
                     continue
                 AgatstonValue = 0.0
                 if slice_ls.HasLabel(label):
