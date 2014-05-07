@@ -46,7 +46,7 @@ class CardiacAgatstonMeasuresWidget:
             self.parent.show()
 
         # imports custom Slicer lookup color table file
-        slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
+        #slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
 
     def setup(self):
         # Instantiate and connect widgets ...
@@ -144,8 +144,7 @@ class CardiacAgatstonMeasuresWidget:
         # localEditBox = CardiacEditBox(parent=self.parent)
         # localEditorWidget = Editor.EditorWidget(parent=self.parent)
         # localEditorWidget.setup()
-        localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=True)
-        localCardiacEditorWidget.setup()
+
 
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
@@ -221,6 +220,15 @@ class CardiacAgatstonMeasuresWidget:
         cardiacLUT = slicer.util.getNode('cardiacLUT')
         cardiacLutTable = cardiacLUT.GetLookupTable()
         colorNode.SetLookupTable(cardiacLutTable)
+        self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
+        self.localCardiacEditorWidget.setup()
+
+        # self.localCardiacEditorWidget.helper.setVolumes(self.inputSelector.currentNode(), slicer.util.getNode('calcium'))
+
+        # colorNode = self.editUtil.getColorNode()
+        # cardiacLUT = slicer.util.getNode('cardiacLUT')
+        # cardiacLutTable = cardiacLUT.GetLookupTable()
+        # colorNode.SetLookupTable(cardiacLutTable)
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
@@ -607,6 +615,27 @@ class CardiacEditBox(EditorLib.EditBox):
 
 
 class CardiacHelperBox(EditorLib.HelperBox):
+
+    def edit(self,label):
+        """select the picked label for editing"""
+
+        merge = self.mergeVolume()
+        print "&"*50
+        print merge
+        if not merge:
+            print "****Not Merge******"
+            return
+        colorNode = merge.GetDisplayNode().GetColorNode()
+
+        structureName = colorNode.GetColorName( label )
+        structureVolume = self.structureVolume( structureName )
+
+        # make the master node the active background, and the structure label node the active label
+        selectionNode = self.applicationLogic.GetSelectionNode()
+        selectionNode.SetReferenceActiveVolumeID(self.master.GetID())
+        if structureVolume:
+            selectionNode.SetReferenceActiveLabelVolumeID( structureVolume.GetID() )
+        self.applicationLogic.PropagateVolumeSelection(0)
 
     def create(self):
         """create the segmentation helper box"""
