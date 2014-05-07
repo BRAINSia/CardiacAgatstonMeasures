@@ -216,26 +216,17 @@ class CardiacAgatstonMeasuresWidget:
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage,'calcium')
-        colorNode = self.editUtil.getColorNode()
-        cardiacLUT = slicer.util.getNode('cardiacLUT')
-        cardiacLutTable = cardiacLUT.GetLookupTable()
-        colorNode.SetLookupTable(cardiacLutTable)
+
+        # Set the color lookup table (LUT) to the custom cardiacLUT
+        calciumNode = slicer.util.getNode('calcium')
+        cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        cardiacLutID = cardiacLutNode.GetID()
+        calciumDisplayNode = calciumNode.GetDisplayNode()
+        calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
+
+        # Creates and adds the custom Editor Widget to the module
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
-
-        # self.localCardiacEditorWidget.helper.setVolumes(self.inputSelector.currentNode(), slicer.util.getNode('calcium'))
-
-        # colorNode = self.editUtil.getColorNode()
-        # cardiacLUT = slicer.util.getNode('cardiacLUT')
-        # cardiacLutTable = cardiacLUT.GetLookupTable()
-        # colorNode.SetLookupTable(cardiacLutTable)
-
-                #
-        # calciumNode = slicer.util.getNode('calcium')
-        # cardiacLutNode = slicer.util.getNode('cardiacLUT')
-        # cardiacLutID = cardiacLutNode.GetID()
-        # calciumDisplayNode = calciumNode.GetDisplayNode()
-        # calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
