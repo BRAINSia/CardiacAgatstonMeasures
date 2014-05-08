@@ -33,8 +33,9 @@ class CardiacAgatstonMeasuresWidget:
         self.thresholdValue = 130
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
+        self.inputImageNode = None
+        self.calciumLabelNode = None
         self.cardiacLutNode = None
-        self.InputTestImageNode = None
 
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -46,6 +47,8 @@ class CardiacAgatstonMeasuresWidget:
         if not parent:
             self.setup()
             self.parent.show()
+
+        self.InputTestImageNode = None
 
         # import test image
         self.InputTestImageNode = slicer.util.getNode('p1_1')
@@ -200,16 +203,17 @@ class CardiacAgatstonMeasuresWidget:
 
     def onThresholdButtonClicked(self):
         print "Thresholding at {0}".format(self.thresholdValue)
-        inputVolumeName = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
+        self.inputImageNode = self.inputSelector.currentNode()
+        inputVolumeName = su.PullFromSlicer(self.inputImageNode.GetName())
         thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage,'calcium')
 
         # Set the color lookup table (LUT) to the custom cardiacLUT
-        calciumNode = slicer.util.getNode('calcium')
-        cardiacLutNode = slicer.util.getNode('cardiacLUT')
-        cardiacLutID = cardiacLutNode.GetID()
-        calciumDisplayNode = calciumNode.GetDisplayNode()
+        self.calciumLabelNode = slicer.util.getNode('calcium')
+        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        cardiacLutID = self.cardiacLutNode.GetID()
+        calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
         calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
 
         # Creates and adds the custom Editor Widget to the module
