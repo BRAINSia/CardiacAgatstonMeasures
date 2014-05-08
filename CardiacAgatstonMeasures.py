@@ -91,15 +91,9 @@ class CardiacAgatstonMeasuresWidget:
         self.labelsCollapsibleButton.text = "Label Parameters"
         #self.layout.addWidget(self.labelsCollapsibleButton)
 
-        # Collapsible button for Statistics Parameters
-        self.statisticsCollapsibleButton = ctk.ctkCollapsibleButton()
-        self.statisticsCollapsibleButton.text = "Statistics Parameters"
-        self.layout.addWidget(self.statisticsCollapsibleButton)
-
         # Layout within the sample collapsible button
         self.measuresFormLayout = qt.QFormLayout(self.measuresCollapsibleButton)
         self.labelsFormLayout = qt.QFormLayout(self.labelsCollapsibleButton)
-        self.statisticsFormLayout = qt.QFormLayout(self.statisticsCollapsibleButton)
 
         # The Input Volume Selector
         self.inputFrame = qt.QFrame(self.measuresCollapsibleButton)
@@ -166,18 +160,12 @@ class CardiacAgatstonMeasuresWidget:
         # localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
         # localLabelStatisticsWidget.setup()
 
-        # Calculate Statistics Button
-        calculateButton = qt.QPushButton("Calculate Statistics")
-        calculateButton.toolTip = "Calculating Statistics"
-        self.statisticsFormLayout.addRow(calculateButton)
-        calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
-
         # Add vertical spacer
         self.layout.addStretch(1)
         
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
-        self.calculateButton = calculateButton
+        # self.calculateButton = calculateButton
         self.LMchangeIslandButton = LMchangeIslandButton
         self.LADchangeIslandButton = LADchangeIslandButton
         self.LCXchangeIslandButton = LCXchangeIslandButton
@@ -231,6 +219,15 @@ class CardiacAgatstonMeasuresWidget:
         # Creates and adds the custom Editor Widget to the module
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
+
+        self.addCalculateButton()
+
+    def addCalculateButton(self):
+        # Calculate Statistics Button
+        calculateButton = qt.QPushButton("Calculate Statistics")
+        calculateButton.toolTip = "Calculating Statistics"
+        self.parent.layout().addWidget(calculateButton)
+        calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
 
     def onCalculatedButtonClicked(self):
         #Just temporary code, will calculate statistics and show in table
