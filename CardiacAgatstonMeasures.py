@@ -397,56 +397,8 @@ class CardiacAgatstonMeasuresWidget:
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
 
     def setup(self):
-        #
-        # the grayscale volume selector
-        #
-        self.grayscaleSelectorFrame = qt.QFrame(self.parent)
-        self.grayscaleSelectorFrame.setLayout(qt.QHBoxLayout())
-        self.parent.layout().addWidget(self.grayscaleSelectorFrame)
 
-        self.grayscaleSelectorLabel = qt.QLabel("Grayscale Volume: ", self.grayscaleSelectorFrame)
-        self.grayscaleSelectorLabel.setToolTip( "Select the grayscale volume (background grayscale scalar volume node) for statistics calculations")
-        self.grayscaleSelectorFrame.layout().addWidget(self.grayscaleSelectorLabel)
-
-        self.grayscaleSelector = slicer.qMRMLNodeComboBox(self.grayscaleSelectorFrame)
-        self.grayscaleSelector.nodeTypes = ( ("vtkMRMLScalarVolumeNode"), "" )
-        self.grayscaleSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", 0 )
-        self.grayscaleSelector.selectNodeUponCreation = False
-        self.grayscaleSelector.addEnabled = False
-        self.grayscaleSelector.removeEnabled = False
-        self.grayscaleSelector.noneEnabled = True
-        self.grayscaleSelector.showHidden = False
-        self.grayscaleSelector.showChildNodeTypes = False
-        self.grayscaleSelector.setMRMLScene( slicer.mrmlScene )
-        # TODO: need to add a QLabel
-        # self.grayscaleSelector.SetLabelText( "Master Volume:" )
-        self.grayscaleSelectorFrame.layout().addWidget(self.grayscaleSelector)
-
-        #
-        # the label volume selector
-        #
-        self.labelSelectorFrame = qt.QFrame()
-        self.labelSelectorFrame.setLayout( qt.QHBoxLayout() )
-        self.parent.layout().addWidget( self.labelSelectorFrame )
-
-        self.labelSelectorLabel = qt.QLabel()
-        self.labelSelectorLabel.setText( "Label Map: " )
-        self.labelSelectorFrame.layout().addWidget( self.labelSelectorLabel )
-
-        self.labelSelector = slicer.qMRMLNodeComboBox()
-        self.labelSelector.nodeTypes = ( "vtkMRMLScalarVolumeNode", "" )
-        self.labelSelector.addAttribute( "vtkMRMLScalarVolumeNode", "LabelMap", "1" )
-        # todo addAttribute
-        self.labelSelector.selectNodeUponCreation = False
-        self.labelSelector.addEnabled = False
-        self.labelSelector.noneEnabled = True
-        self.labelSelector.removeEnabled = False
-        self.labelSelector.showHidden = False
-        self.labelSelector.showChildNodeTypes = False
-        self.labelSelector.setMRMLScene( slicer.mrmlScene )
-        self.labelSelector.setToolTip( "Pick the label map to edit" )
-        self.labelSelectorFrame.layout().addWidget( self.labelSelector )
-
+        # Set the grayscaleNode and labelNode to the current active volume and label
         selectionNode = slicer.app.applicationLogic().GetSelectionNode()
         self.grayscaleNode = slicer.util.getNode(selectionNode.GetActiveVolumeID())
         self.labelNode = slicer.util.getNode(selectionNode.GetActiveLabelVolumeID())
@@ -492,8 +444,6 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.applyButton.connect('clicked()', self.onApply)
         self.chartButton.connect('clicked()', self.onChart)
         self.saveButton.connect('clicked()', self.onSave)
-        self.grayscaleSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onGrayscaleSelect)
-        self.labelSelector.connect('currentNodeChanged(vtkMRMLNode*)', self.onLabelSelect)
 
 class CardiacEditorWidget(Editor.EditorWidget):
 
