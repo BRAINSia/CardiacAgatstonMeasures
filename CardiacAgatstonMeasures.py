@@ -111,18 +111,6 @@ class CardiacAgatstonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
-        # Radio Buttons for Selecting 80 KEV or 120 KEV
-        self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
-        self.measuresFormLayout.addRow(self.RadioButtonsFrame)
-        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
-        self.KEV80.setToolTip("Select 80 KEV.")
-        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
-        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
-        self.KEV120.setToolTip("Select 120 KEV.")
-        self.KEV120.checked = True
-        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
-
         # Threshold button
         thresholdButton = qt.QPushButton("Threshold Volume")
         thresholdButton.toolTip = "Threshold the selected Input Volume"
@@ -164,7 +152,6 @@ class CardiacAgatstonMeasuresWidget:
         
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
-        # self.calculateButton = calculateButton
         self.LMchangeIslandButton = LMchangeIslandButton
         self.LADchangeIslandButton = LADchangeIslandButton
         self.LCXchangeIslandButton = LCXchangeIslandButton
@@ -220,95 +207,9 @@ class CardiacAgatstonMeasuresWidget:
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
 
-        self.addCalculateButton()
-
         # Adds Label Statistics Widget to Module
         localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
         localLabelStatisticsWidget.setup()
-
-    def addCalculateButton(self):
-        # Calculate Statistics Button
-        calculateButton = qt.QPushButton("Calculate Statistics")
-        calculateButton.toolTip = "Calculating Statistics"
-        self.parent.layout().addWidget(calculateButton)
-        calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
-
-    def onCalculatedButtonClicked(self):
-
-        #Just temporary code, will calculate statistics and show in table
-        print "Calculating Statistics"
-        calcium = su.PullFromSlicer('calcium')
-        all_labels = [0, 1, 2, 3, 4, 5]
-        heart = su.PullFromSlicer(self.inputSelector.currentNode().GetName())
-        sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
-        #print sliceAgatstonPerLabel
-        print "-"*50
-        self.computeOverallAgatstonScore(sliceAgatstonPerLabel)
-        print "-"*50
-
-    def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
-        AgatstonScoresPerLabel = list()
-        for (label, scores) in sliceAgatstonPerLabel.items():
-            labelScore =  sum(scores)
-            print "Label", label, ": Agatston Score = ", labelScore
-            AgatstonScoresPerLabel.append(labelScore)
-        print
-        print "TOTAL Agatston Score = ", sum(AgatstonScoresPerLabel)
-
-    def KEV2AgatstonIndex(self, kev):
-        AgatstonIndex = 0.0
-        if self.KEV120.checked:
-            if kev >= 130:   #range = 130-199
-                AgatstonIndex = 1.0
-            if kev >= 200:   #range = 200-299
-                AgatstonIndex = 2.0
-            if kev >= 300:   #range = 300-399
-                AgatstonIndex = 3.0
-            if kev >= 400:   #range >= 400
-                AgatstonIndex = 4.0
-        elif self.KEV80.checked:
-            if kev >= 167:   #range = 167-265
-                AgatstonIndex = 1.0
-            if kev >= 266:   #range = 266-407
-                AgatstonIndex = 2.0
-            if kev >= 408:   #range = 408-550
-                AgatstonIndex = 3.0
-            if kev >= 551:   #range >= 551
-                AgatstonIndex = 4.0
-        return AgatstonIndex
-
-    def ComputeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
-        sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
-        ##Initialize Dictionary entries with empty list
-        for label in all_labels:
-            if label == 0 or label == 1:
-                continue
-            sliceAgatstonPerLabel[label]=list()
-
-        ImageSpacing = calcium.GetSpacing()
-        ImageIndex=range(0,calcium.GetSize()[2])
-        for index in ImageIndex:
-            slice_calcium = calcium[:,:,index]
-            slice_img = heart[:,:,index]
-            slice_ls=sitk.LabelStatisticsImageFilter()
-            slice_ls.Execute(slice_img,slice_calcium)
-            for label in all_labels:
-                if label == 0 or label == 1:
-                    continue
-                AgatstonValue = 0.0
-                if slice_ls.HasLabel(label):
-                    slice_count = slice_ls.GetCount(label)
-                    slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
-                    #slice_volume = slice_area*ImageSpacing[2]
-                    #slice_mean = slice_ls.GetMean(label)
-                    slice_max = slice_ls.GetMaximum(label)
-                    #print "label: ",label," index: ",index," slice area: ", slice_area," ", slice_max, " ", KEV2AgatstonIndex( slice_max )*slice_area
-                    slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
-                    #slice_load = slice_mean
-                    AgatstonValue = slice_Agatston
-
-                sliceAgatstonPerLabel[label].append(AgatstonValue)
-        return sliceAgatstonPerLabel
 
     def onReload(self,moduleName="CardiacAgatstonMeasures"):
         """Generic reload method for any scripted module.
@@ -403,6 +304,18 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.grayscaleNode = slicer.util.getNode(selectionNode.GetActiveVolumeID())
         self.labelNode = slicer.util.getNode(selectionNode.GetActiveLabelVolumeID())
 
+        # Radio Buttons for Selecting 80 KEV or 120 KEV
+        self.RadioButtonsFrame = qt.QFrame()
+        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
+        self.parent.layout().addWidget(self.RadioButtonsFrame)
+        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
+        self.KEV80.setToolTip("Select 80 KEV.")
+        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
+        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
+        self.KEV120.setToolTip("Select 120 KEV.")
+        self.KEV120.checked = True
+        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
+
         # Apply button
         self.applyButton = qt.QPushButton("Apply")
         self.applyButton.toolTip = "Calculate Statistics."
@@ -454,6 +367,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
             return
 
         self.applyButton.text = "Working..."
+        self.onCalculatedButtonClicked()
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
         slicer.app.processEvents()
@@ -462,6 +376,83 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.chartFrame.enabled = True
         self.saveButton.enabled = True
         self.applyButton.text = "Apply"
+
+    def onCalculatedButtonClicked(self):
+
+        #Just temporary code, will calculate statistics and show in table
+        print "Calculating Statistics"
+        calcium = su.PullFromSlicer(self.labelNode.GetName())
+        all_labels = [0, 1, 2, 3, 4, 5]
+        heart = su.PullFromSlicer(self.grayscaleNode.GetName())
+        sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
+        #print sliceAgatstonPerLabel
+        print "-"*50
+        self.computeOverallAgatstonScore(sliceAgatstonPerLabel)
+        print "-"*50
+
+    def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
+        AgatstonScoresPerLabel = list()
+        for (label, scores) in sliceAgatstonPerLabel.items():
+            labelScore =  sum(scores)
+            print "Label", label, ": Agatston Score = ", labelScore
+            AgatstonScoresPerLabel.append(labelScore)
+        print
+        print "TOTAL Agatston Score = ", sum(AgatstonScoresPerLabel)
+
+    def KEV2AgatstonIndex(self, kev):
+        AgatstonIndex = 0.0
+        if self.KEV120.checked:
+            if kev >= 130:   #range = 130-199
+                AgatstonIndex = 1.0
+            if kev >= 200:   #range = 200-299
+                AgatstonIndex = 2.0
+            if kev >= 300:   #range = 300-399
+                AgatstonIndex = 3.0
+            if kev >= 400:   #range >= 400
+                AgatstonIndex = 4.0
+        elif self.KEV80.checked:
+            if kev >= 167:   #range = 167-265
+                AgatstonIndex = 1.0
+            if kev >= 266:   #range = 266-407
+                AgatstonIndex = 2.0
+            if kev >= 408:   #range = 408-550
+                AgatstonIndex = 3.0
+            if kev >= 551:   #range >= 551
+                AgatstonIndex = 4.0
+        return AgatstonIndex
+
+    def ComputeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
+        sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
+        ##Initialize Dictionary entries with empty list
+        for label in all_labels:
+            if label == 0 or label == 1:
+                continue
+            sliceAgatstonPerLabel[label]=list()
+
+        ImageSpacing = calcium.GetSpacing()
+        ImageIndex=range(0,calcium.GetSize()[2])
+        for index in ImageIndex:
+            slice_calcium = calcium[:,:,index]
+            slice_img = heart[:,:,index]
+            slice_ls=sitk.LabelStatisticsImageFilter()
+            slice_ls.Execute(slice_img,slice_calcium)
+            for label in all_labels:
+                if label == 0 or label == 1:
+                    continue
+                AgatstonValue = 0.0
+                if slice_ls.HasLabel(label):
+                    slice_count = slice_ls.GetCount(label)
+                    slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
+                    #slice_volume = slice_area*ImageSpacing[2]
+                    #slice_mean = slice_ls.GetMean(label)
+                    slice_max = slice_ls.GetMaximum(label)
+                    #print "label: ",label," index: ",index," slice area: ", slice_area," ", slice_max, " ", KEV2AgatstonIndex( slice_max )*slice_area
+                    slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
+                    #slice_load = slice_mean
+                    AgatstonValue = slice_Agatston
+
+                sliceAgatstonPerLabel[label].append(AgatstonValue)
+        return sliceAgatstonPerLabel
 
 class CardiacEditorWidget(Editor.EditorWidget):
 
