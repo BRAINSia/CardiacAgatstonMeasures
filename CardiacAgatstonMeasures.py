@@ -33,6 +33,8 @@ class CardiacAgatstonMeasuresWidget:
         self.thresholdValue = 130
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
+        self.cardiacLutNode = None
+        self.InputTestImageNode = None
 
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -45,8 +47,15 @@ class CardiacAgatstonMeasuresWidget:
             self.setup()
             self.parent.show()
 
+        # import test image
+        self.InputTestImageNode = slicer.util.getNode('p1_1')
+        if not self.InputTestImageNode:
+            slicer.util.loadVolume('/tmp/p1_1.nii.gz')
+
         # imports custom Slicer lookup color table file
-        #slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
+        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        if not self.cardiacLutNode:
+            slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
 
     def setup(self):
         # Instantiate and connect widgets ...
@@ -80,7 +89,7 @@ class CardiacAgatstonMeasuresWidget:
         # Collapsible button for Label Parameters
         self.labelsCollapsibleButton = ctk.ctkCollapsibleButton()
         self.labelsCollapsibleButton.text = "Label Parameters"
-        self.layout.addWidget(self.labelsCollapsibleButton)
+        #self.layout.addWidget(self.labelsCollapsibleButton)
 
         # Collapsible button for Statistics Parameters
         self.statisticsCollapsibleButton = ctk.ctkCollapsibleButton()
