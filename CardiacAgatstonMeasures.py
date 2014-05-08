@@ -445,6 +445,24 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.chartButton.connect('clicked()', self.onChart)
         self.saveButton.connect('clicked()', self.onSave)
 
+    def onApply(self):
+        """Calculate the label statistics
+        """
+        if not self.volumesAreValid():
+            qt.QMessageBox.warning(slicer.util.mainWindow(),
+                "Label Statistics", "Volumes do not have the same geometry.")
+            return
+
+        self.applyButton.text = "Working..."
+        # TODO: why doesn't processEvents alone make the label text change?
+        self.applyButton.repaint()
+        slicer.app.processEvents()
+        self.logic = LabelStatistics.LabelStatisticsLogic(self.grayscaleNode, self.labelNode)
+        self.populateStats()
+        self.chartFrame.enabled = True
+        self.saveButton.enabled = True
+        self.applyButton.text = "Apply"
+
 class CardiacEditorWidget(Editor.EditorWidget):
 
     def createEditBox(self):
