@@ -114,6 +114,18 @@ class CardiacAgatstonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
+        # Radio Buttons for Selecting 80 KEV or 120 KEV
+        self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.RadioButtonsFrame)
+        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
+        self.KEV80.setToolTip("Select 80 KEV.")
+        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
+        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
+        self.KEV120.setToolTip("Select 120 KEV.")
+        self.KEV120.checked = True
+        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
+
         # Threshold button
         thresholdButton = qt.QPushButton("Threshold Volume")
         thresholdButton.toolTip = "Threshold the selected Input Volume"
@@ -149,18 +161,6 @@ class CardiacAgatstonMeasuresWidget:
         quitLabelChanger.toolTip = "Click to stop any of the change label buttons"
         self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
-
-        # Radio Buttons for Selecting 80 KEV or 120 KEV
-        self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
-        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
-        self.statisticsFormLayout.addRow(self.RadioButtonsFrame)
-        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
-        self.KEV80.setToolTip("Select 80 KEV.")
-        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
-        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
-        self.KEV120.setToolTip("Select 120 KEV.")
-        self.KEV120.checked = True
-        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
         # Adds Label Statistics Widget to Module
         # localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
