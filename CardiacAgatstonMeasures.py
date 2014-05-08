@@ -156,10 +156,6 @@ class CardiacAgatstonMeasuresWidget:
         self.labelsFormLayout.addRow(quitLabelChanger)
         quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
 
-        # Adds Label Statistics Widget to Module
-        # localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
-        # localLabelStatisticsWidget.setup()
-
         # Add vertical spacer
         self.layout.addStretch(1)
         
@@ -222,6 +218,10 @@ class CardiacAgatstonMeasuresWidget:
 
         self.addCalculateButton()
 
+        # Adds Label Statistics Widget to Module
+        localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
+        localLabelStatisticsWidget.setup()
+
     def addCalculateButton(self):
         # Calculate Statistics Button
         calculateButton = qt.QPushButton("Calculate Statistics")
@@ -230,6 +230,7 @@ class CardiacAgatstonMeasuresWidget:
         calculateButton.connect('clicked(bool)', self.onCalculatedButtonClicked)
 
     def onCalculatedButtonClicked(self):
+
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
         calcium = su.PullFromSlicer('calcium')
@@ -500,7 +501,7 @@ class CardiacEditBox(EditorLib.EditBox):
 
     # create the edit box
     def create(self):
-        
+
         self.findEffects()
 
         self.mainFrame = qt.QFrame(self.parent)
