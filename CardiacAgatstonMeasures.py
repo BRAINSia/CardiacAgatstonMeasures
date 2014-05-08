@@ -489,6 +489,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
 class CardiacEditorWidget(Editor.EditorWidget):
 
     def createEditBox(self):
+        self.editLabelMapsFrame.collapsed = False
         self.editBoxFrame = qt.QFrame(self.effectsToolsFrame)
         self.editBoxFrame.objectName = 'EditBoxFrame'
         self.editBoxFrame.setLayout(qt.QVBoxLayout())
@@ -499,7 +500,7 @@ class CardiacEditBox(EditorLib.EditBox):
 
     # create the edit box
     def create(self):
-
+        
         self.findEffects()
 
         self.mainFrame = qt.QFrame(self.parent)
