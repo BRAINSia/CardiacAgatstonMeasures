@@ -447,10 +447,14 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.labelSelector.setToolTip( "Pick the label map to edit" )
         self.labelSelectorFrame.layout().addWidget( self.labelSelector )
 
+        selectionNode = slicer.app.applicationLogic().GetSelectionNode()
+        self.grayscaleNode = slicer.util.getNode(selectionNode.GetActiveVolumeID())
+        self.labelNode = slicer.util.getNode(selectionNode.GetActiveLabelVolumeID())
+
         # Apply button
         self.applyButton = qt.QPushButton("Apply")
         self.applyButton.toolTip = "Calculate Statistics."
-        self.applyButton.enabled = False
+        self.applyButton.enabled = True
         self.parent.layout().addWidget(self.applyButton)
 
         # model and view for stats table
