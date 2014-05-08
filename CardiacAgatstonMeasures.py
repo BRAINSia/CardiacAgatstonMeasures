@@ -522,15 +522,17 @@ class CardiacEditBox(EditorLib.EditBox):
 
         # create all of the buttons
         # createButtonRow() ensures that only effects in self.effects are exposed,
-        self.createButtonRow( ("DefaultTool", "IdentifyIslandsEffect", "ChangeIslandEffect", "RemoveIslandsEffect", "SaveIslandEffect","ThresholdEffect", "ChangeLabelEffect", "MakeModelEffect") )
+
+        self.createButtonRow( ("ChangeIslandEffect", "DefaultTool"), rowLabel="ChangeIsland/Default Tool: " )
+        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
+        self.createButtonRow( ("IdentifyIslandsEffect", "RemoveIslandsEffect", "SaveIslandEffect",
+                               "ThresholdEffect", "ChangeLabelEffect", "MakeModelEffect"),
+                               rowLabel="Extra Tools: " )
 
         extensions = []
         for k in slicer.modules.editorExtensions:
             extensions.append(k)
         self.createButtonRow( extensions )
-
-        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
-
         #
         # the labels
         #
