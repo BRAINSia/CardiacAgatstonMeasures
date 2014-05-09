@@ -111,6 +111,18 @@ class CardiacAgatstonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
+        # Radio Buttons for Selecting 80 KEV or 120 KEV
+        self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
+        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
+        self.measuresFormLayout.addRow(self.RadioButtonsFrame)
+        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
+        self.KEV80.setToolTip("Select 80 KEV.")
+        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
+        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
+        self.KEV120.setToolTip("Select 120 KEV.")
+        self.KEV120.checked = True
+        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
+
         # Threshold button
         thresholdButton = qt.QPushButton("Threshold Volume")
         thresholdButton.toolTip = "Threshold the selected Input Volume"
@@ -208,7 +220,7 @@ class CardiacAgatstonMeasuresWidget:
         self.localCardiacEditorWidget.setup()
 
         # Adds Label Statistics Widget to Module
-        localLabelStatisticsWidget = CardiacStatisticsWidget(parent=self.parent)
+        localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80, parent=self.parent)
         localLabelStatisticsWidget.setup()
 
     def onReload(self,moduleName="CardiacAgatstonMeasures"):
@@ -296,7 +308,7 @@ class CardiacAgatstonMeasuresWidget:
         setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
-    def __init__(self, parent=None):
+    def __init__(self, KEV120, KEV80, parent=None):
         self.chartOptions = ("Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -309,6 +321,8 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.labelNode = None
         self.fileName = None
         self.fileDialog = None
+        self.KEV120 = KEV120
+        self.KEV80 = KEV80
         if not parent:
             self.setup()
             self.grayscaleSelector.setMRMLScene(slicer.mrmlScene)
@@ -321,18 +335,6 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         selectionNode = slicer.app.applicationLogic().GetSelectionNode()
         self.grayscaleNode = slicer.util.getNode(selectionNode.GetActiveVolumeID())
         self.labelNode = slicer.util.getNode(selectionNode.GetActiveLabelVolumeID())
-
-        # Radio Buttons for Selecting 80 KEV or 120 KEV
-        self.RadioButtonsFrame = qt.QFrame()
-        self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
-        self.parent.layout().addWidget(self.RadioButtonsFrame)
-        self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
-        self.KEV80.setToolTip("Select 80 KEV.")
-        self.RadioButtonsFrame.layout().addWidget(self.KEV80)
-        self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
-        self.KEV120.setToolTip("Select 120 KEV.")
-        self.KEV120.checked = True
-        self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
         # Apply button
         self.applyButton = qt.QPushButton("Apply")
