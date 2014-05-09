@@ -399,8 +399,11 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
             col = 1
             for k in self.logic.keys:
                 item = qt.QStandardItem()
-                # set data as float with Qt::DisplayRole
-                item.setData(float(self.logic.labelStats[i,k]),qt.Qt.DisplayRole)
+                if k == "Label Name":
+                    item.setData(self.logic.labelStats[i,k],qt.Qt.DisplayRole)
+                else:
+                    # set data as float with Qt::DisplayRole
+                    item.setData(float(self.logic.labelStats[i,k]),qt.Qt.DisplayRole)
                 item.setToolTip(colorNode.GetColorName(i))
                 self.model.setItem(row,col,item)
                 self.items.append(item)
@@ -424,7 +427,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
     def __init__(self, grayscaleNode, labelNode, KEV120, KEV80, fileName=None):
         #import numpy
 
-        self.keys = ("Index", "Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
+        self.keys = ("Index", "Label Name", "Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
         cubicMMPerVoxel = reduce(lambda x,y: x*y, labelNode.GetSpacing())
         ccPerCubicMM = 0.001
 
@@ -500,6 +503,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 # add an entry to the LabelStats list
                 self.labelStats["Labels"].append(i)
                 self.labelStats[i,"Index"] = i
+                self.labelStats[i,"Label Name"] = colorNode.GetColorName(i)
                 self.labelStats[i,"Agatston Score"] = self.AgatstonScoresPerLabel[i]
                 self.labelStats[i,"Count"] = stat1.GetVoxelCount()
                 self.labelStats[i,"Volume mm^3"] = self.labelStats[i,"Count"] * cubicMMPerVoxel
