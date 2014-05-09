@@ -315,7 +315,7 @@ class CardiacAgatstonMeasuresWidget:
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, parent=None):
-        self.chartOptions = ("Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
+        self.chartOptions = ("Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
         if not parent:
             self.parent = slicer.qMRMLWidget()
             self.parent.setLayout(qt.QVBoxLayout())
