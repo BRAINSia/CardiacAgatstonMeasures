@@ -296,6 +296,24 @@ class CardiacAgatstonMeasuresWidget:
         setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
+    def __init__(self, parent=None):
+        self.chartOptions = ("Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
+        if not parent:
+            self.parent = slicer.qMRMLWidget()
+            self.parent.setLayout(qt.QVBoxLayout())
+            self.parent.setMRMLScene(slicer.mrmlScene)
+        else:
+            self.parent = parent
+        self.logic = None
+        self.grayscaleNode = None
+        self.labelNode = None
+        self.fileName = None
+        self.fileDialog = None
+        if not parent:
+            self.setup()
+            self.grayscaleSelector.setMRMLScene(slicer.mrmlScene)
+            self.labelSelector.setMRMLScene(slicer.mrmlScene)
+            self.parent.show()
 
     def setup(self):
 
