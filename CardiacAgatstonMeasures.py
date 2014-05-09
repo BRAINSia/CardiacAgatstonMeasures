@@ -633,9 +633,6 @@ class CardiacEditBox(EditorLib.EditBox):
 
         self.createButtonRow( ("ChangeIslandEffect", "DefaultTool"), rowLabel="ChangeIsland/Default Tool: " )
         self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
-        self.createButtonRow( ("IdentifyIslandsEffect", "RemoveIslandsEffect", "SaveIslandEffect",
-                               "ThresholdEffect", "ChangeLabelEffect", "MakeModelEffect"),
-                               rowLabel="Extra Tools: " )
 
         extensions = []
         for k in slicer.modules.editorExtensions:
