@@ -117,10 +117,11 @@ class CardiacAgatstonMeasuresWidget:
         self.measuresFormLayout.addRow(self.RadioButtonsFrame)
         self.KEV80 = qt.QRadioButton("80 KEV", self.RadioButtonsFrame)
         self.KEV80.setToolTip("Select 80 KEV.")
+        self.KEV80.checked = False
         self.RadioButtonsFrame.layout().addWidget(self.KEV80)
         self.KEV120 = qt.QRadioButton("120 KEV", self.RadioButtonsFrame)
         self.KEV120.setToolTip("Select 120 KEV.")
-        self.KEV120.checked = True
+        self.KEV120.checked = False
         self.RadioButtonsFrame.layout().addWidget(self.KEV120)
 
         # Threshold button
@@ -201,6 +202,11 @@ class CardiacAgatstonMeasuresWidget:
         self.changeIslandTool = None
 
     def onThresholdButtonClicked(self):
+        if not self.KEV120.checked and not self.KEV80.checked:
+            qt.QMessageBox.warning(slicer.util.mainWindow(),
+                "Select KEV", "The KEV (80 or 120) must be selected to continue.")
+            return
+
         print "Thresholding at {0}".format(self.thresholdValue)
         self.inputImageNode = self.inputSelector.currentNode()
         inputVolumeName = su.PullFromSlicer(self.inputImageNode.GetName())
