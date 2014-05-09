@@ -482,6 +482,10 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         self.calculateAgatstonScores()
 
         for i in xrange(lo,hi+1):
+            # skip indices 0 (background) and 1 (default threshold pixels)
+            # because these are not calcium and do not have an Agatston score
+            if i == 0 or i == 1:
+                continue
 
             # this->SetProgress((float)i/hi);
             # std::string event_message = "Label "; std::stringstream s; s << i; event_message.append(s.str());
