@@ -376,6 +376,45 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.saveButton.enabled = True
         self.applyButton.text = "Apply"
 
+    def populateStats(self):
+        if not self.logic:
+            return
+        displayNode = self.labelNode.GetDisplayNode()
+        colorNode = displayNode.GetColorNode()
+        lut = colorNode.GetLookupTable()
+        self.items = []
+        self.model = qt.QStandardItemModel()
+        self.view.setModel(self.model)
+        self.view.verticalHeader().visible = False
+        row = 0
+        for i in self.logic.labelStats["Labels"]:
+            color = qt.QColor()
+            rgb = lut.GetTableValue(i)
+            color.setRgb(rgb[0]*255,rgb[1]*255,rgb[2]*255)
+            item = qt.QStandardItem()
+            item.setData(color,qt.Qt.DecorationRole)
+            item.setToolTip(colorNode.GetColorName(i))
+            self.model.setItem(row,0,item)
+            self.items.append(item)
+            col = 1
+            for k in self.logic.keys:
+                item = qt.QStandardItem()
+                # set data as float with Qt::DisplayRole
+                item.setData(float(self.logic.labelStats[i,k]),qt.Qt.DisplayRole)
+                item.setToolTip(colorNode.GetColorName(i))
+                self.model.setItem(row,col,item)
+                self.items.append(item)
+                col += 1
+            row += 1
+
+        self.view.setColumnWidth(0,30)
+        self.model.setHeaderData(0,1," ")
+        col = 1
+        for k in self.logic.keys:
+            self.view.setColumnWidth(col,15*len(k))
+            self.model.setHeaderData(col,1,k)
+            col += 1
+
 class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
     """Implement the logic to calculate label statistics.
       Nodes are passed in as arguments.
