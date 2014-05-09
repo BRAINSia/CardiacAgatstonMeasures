@@ -367,15 +367,102 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
             return
 
         self.applyButton.text = "Working..."
-        self.onCalculatedButtonClicked()
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
         slicer.app.processEvents()
-        self.logic = LabelStatistics.LabelStatisticsLogic(self.grayscaleNode, self.labelNode)
+        self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, self.labelNode)
         self.populateStats()
         self.chartFrame.enabled = True
         self.saveButton.enabled = True
         self.applyButton.text = "Apply"
+
+class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
+    """Implement the logic to calculate label statistics.
+      Nodes are passed in as arguments.
+      Results are stored as 'statistics' instance variable.
+      """
+
+    def __init__(self, grayscaleNode, labelNode, fileName=None):
+        #import numpy
+
+        self.keys = ("Index", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
+        cubicMMPerVoxel = reduce(lambda x,y: x*y, labelNode.GetSpacing())
+        ccPerCubicMM = 0.001
+
+        # TODO: progress and status updates
+        # this->InvokeEvent(vtkLabelStatisticsLogic::StartLabelStats, (void*)"start label stats")
+
+        self.labelStats = {}
+        self.labelStats['Labels'] = []
+
+        stataccum = vtk.vtkImageAccumulate()
+        if vtk.VTK_MAJOR_VERSION <= 5:
+            stataccum.SetInput(labelNode.GetImageData())
+        else:
+            stataccum.SetInputConnection(labelNode.GetImageDataConnection())
+        stataccum.Update()
+        lo = int(stataccum.GetMin()[0])
+        hi = int(stataccum.GetMax()[0])
+
+        for i in xrange(lo,hi+1):
+
+            # this->SetProgress((float)i/hi);
+            # std::string event_message = "Label "; std::stringstream s; s << i; event_message.append(s.str());
+            # this->InvokeEvent(vtkLabelStatisticsLogic::LabelStatsOuterLoop, (void*)event_message.c_str());
+
+            # logic copied from slicer3 LabelStatistics
+            # to create the binary volume of the label
+            # //logic copied from slicer2 LabelStatistics MaskStat
+            # // create the binary volume of the label
+            thresholder = vtk.vtkImageThreshold()
+            if vtk.VTK_MAJOR_VERSION <= 5:
+                thresholder.SetInput(labelNode.GetImageData())
+            else:
+                thresholder.SetInputConnection(labelNode.GetImageDataConnection())
+            thresholder.SetInValue(1)
+            thresholder.SetOutValue(0)
+            thresholder.ReplaceOutOn()
+            thresholder.ThresholdBetween(i,i)
+            thresholder.SetOutputScalarType(grayscaleNode.GetImageData().GetScalarType())
+            thresholder.Update()
+
+            # this.InvokeEvent(vtkLabelStatisticsLogic::LabelStatsInnerLoop, (void*)"0.25");
+
+            #  use vtk's statistics class with the binary labelmap as a stencil
+            stencil = vtk.vtkImageToImageStencil()
+            if vtk.VTK_MAJOR_VERSION <= 5:
+                stencil.SetInput(thresholder.GetOutput())
+            else:
+                stencil.SetInputConnection(thresholder.GetOutputPort())
+            stencil.ThresholdBetween(1, 1)
+
+            # this.InvokeEvent(vtkLabelStatisticsLogic::LabelStatsInnerLoop, (void*)"0.5")
+
+            stat1 = vtk.vtkImageAccumulate()
+            if vtk.VTK_MAJOR_VERSION <= 5:
+                stat1.SetInput(grayscaleNode.GetImageData())
+            else:
+                stat1.SetInputConnection(grayscaleNode.GetImageDataConnection())
+            stat1.SetStencil(stencil.GetOutput())
+            stat1.Update()
+
+            # this.InvokeEvent(vtkLabelStatisticsLogic::LabelStatsInnerLoop, (void*)"0.75")
+
+            if stat1.GetVoxelCount() > 0:
+                # add an entry to the LabelStats list
+                self.labelStats["Labels"].append(i)
+                self.labelStats[i,"Index"] = i
+                self.labelStats[i,"Count"] = stat1.GetVoxelCount()
+                self.labelStats[i,"Volume mm^3"] = self.labelStats[i,"Count"] * cubicMMPerVoxel
+                self.labelStats[i,"Volume cc"] = self.labelStats[i,"Volume mm^3"] * ccPerCubicMM
+                self.labelStats[i,"Min"] = stat1.GetMin()[0]
+                self.labelStats[i,"Max"] = stat1.GetMax()[0]
+                self.labelStats[i,"Mean"] = stat1.GetMean()[0]
+                self.labelStats[i,"StdDev"] = stat1.GetStandardDeviation()[0]
+
+            # this.InvokeEvent(vtkLabelStatisticsLogic::LabelStatsInnerLoop, (void*)"1")
+
+        # this.InvokeEvent(vtkLabelStatisticsLogic::EndLabelStats, (void*)"end label stats")
 
     def onCalculatedButtonClicked(self):
 
