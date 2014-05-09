@@ -407,6 +407,10 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         displayNode = labelNode.GetDisplayNode()
         colorNode = displayNode.GetColorNode()
 
+        self.labelNode = labelNode
+        self.grayscaleNode = grayscaleNode
+        self.calculateAgatstonScores()
+
         for i in xrange(lo,hi+1):
 
             # this->SetProgress((float)i/hi);
@@ -475,7 +479,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         calcium = su.PullFromSlicer(self.labelNode.GetName())
         all_labels = [0, 1, 2, 3, 4, 5]
         heart = su.PullFromSlicer(self.grayscaleNode.GetName())
-        sliceAgatstonPerLabel = self.ComputeSlicewiseAgatstonScores(calcium, heart, all_labels)
+        sliceAgatstonPerLabel = self.computeSlicewiseAgatstonScores(calcium, heart, all_labels)
         #print sliceAgatstonPerLabel
         print "-"*50
         self.computeOverallAgatstonScore(sliceAgatstonPerLabel)
