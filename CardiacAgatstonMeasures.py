@@ -370,7 +370,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
         slicer.app.processEvents()
-        self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, self.labelNode)
+        self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, self.labelNode, self.KEV120, self.KEV80)
         self.populateStats()
         self.chartFrame.enabled = True
         self.saveButton.enabled = True
@@ -382,7 +382,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
       Results are stored as 'statistics' instance variable.
       """
 
-    def __init__(self, grayscaleNode, labelNode, fileName=None):
+    def __init__(self, grayscaleNode, labelNode, KEV120, KEV80, fileName=None):
         #import numpy
 
         self.keys = ("Index", "Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
@@ -409,6 +409,8 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
 
         self.labelNode = labelNode
         self.grayscaleNode = grayscaleNode
+        self.KEV80 = KEV80
+        self.KEV120 = KEV120
         self.calculateAgatstonScores()
 
         for i in xrange(lo,hi+1):
@@ -459,7 +461,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 # add an entry to the LabelStats list
                 self.labelStats["Labels"].append(i)
                 self.labelStats[i,"Index"] = i
-                self.labelStats[i,"Agatston Score"] = i
+                self.labelStats[i,"Agatston Score"] = self.AgatstonScoresPerLabel[i]
                 self.labelStats[i,"Count"] = stat1.GetVoxelCount()
                 self.labelStats[i,"Volume mm^3"] = self.labelStats[i,"Count"] * cubicMMPerVoxel
                 self.labelStats[i,"Volume cc"] = self.labelStats[i,"Volume mm^3"] * ccPerCubicMM
@@ -486,13 +488,15 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         print "-"*50
 
     def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
-        AgatstonScoresPerLabel = list()
+        self.AgatstonScoresPerLabel = {}
+        # labels 0 and 1 should not have an Agatston score
+        self.AgatstonScoresPerLabel[0] = 0
+        self.AgatstonScoresPerLabel[1] = 0
         for (label, scores) in sliceAgatstonPerLabel.items():
             labelScore =  sum(scores)
             print "Label", label, ": Agatston Score = ", labelScore
-            AgatstonScoresPerLabel.append(labelScore)
-        print
-        print "TOTAL Agatston Score = ", sum(AgatstonScoresPerLabel)
+            self.AgatstonScoresPerLabel[label] = labelScore
+        print "\nTOTAL Agatston Score = ", sum(self.AgatstonScoresPerLabel.values())
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
