@@ -385,7 +385,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
     def __init__(self, grayscaleNode, labelNode, fileName=None):
         #import numpy
 
-        self.keys = ("Index", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
+        self.keys = ("Index", "Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
         cubicMMPerVoxel = reduce(lambda x,y: x*y, labelNode.GetSpacing())
         ccPerCubicMM = 0.001
 
@@ -403,6 +403,9 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         stataccum.Update()
         lo = int(stataccum.GetMin()[0])
         hi = int(stataccum.GetMax()[0])
+
+        displayNode = labelNode.GetDisplayNode()
+        colorNode = displayNode.GetColorNode()
 
         for i in xrange(lo,hi+1):
 
@@ -452,6 +455,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 # add an entry to the LabelStats list
                 self.labelStats["Labels"].append(i)
                 self.labelStats[i,"Index"] = i
+                self.labelStats[i,"Agatston Score"] = i
                 self.labelStats[i,"Count"] = stat1.GetVoxelCount()
                 self.labelStats[i,"Volume mm^3"] = self.labelStats[i,"Count"] * cubicMMPerVoxel
                 self.labelStats[i,"Volume cc"] = self.labelStats[i,"Volume mm^3"] * ccPerCubicMM
@@ -464,7 +468,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
 
         # this.InvokeEvent(vtkLabelStatisticsLogic::EndLabelStats, (void*)"end label stats")
 
-    def onCalculatedButtonClicked(self):
+    def calculateAgatstonScores(self):
 
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
@@ -508,7 +512,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 AgatstonIndex = 4.0
         return AgatstonIndex
 
-    def ComputeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
+    def computeSlicewiseAgatstonScores(self, calcium, heart, all_labels):
         sliceAgatstonPerLabel=dict() ## A dictionary { labels : [AgatstonValues] }
         ##Initialize Dictionary entries with empty list
         for label in all_labels:
