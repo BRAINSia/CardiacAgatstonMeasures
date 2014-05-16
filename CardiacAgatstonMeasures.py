@@ -627,6 +627,13 @@ class CardiacEditBox(EditorLib.EditBox):
         self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
+        # The Default Label Selector
+        defaultChangeIslandButton = qt.QPushButton("Default")
+        defaultChangeIslandButton.toolTip = "Label - Default"
+        defaultChangeIslandButton.setStyleSheet("background-color: rgb(81,208,35)")
+        self.mainFrame.layout().addWidget(defaultChangeIslandButton)
+        defaultChangeIslandButton.connect('clicked(bool)', self.onDefaultChangeIslandButtonClicked)
+
         # create all of the buttons
         # createButtonRow() ensures that only effects in self.effects are exposed,
         self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint", "DefaultTool"), rowLabel="Undo/Redo/Default: " )
@@ -654,6 +661,7 @@ class CardiacEditBox(EditorLib.EditBox):
         self.LADchangeIslandButton = LADchangeIslandButton
         self.LCXchangeIslandButton = LCXchangeIslandButton
         self.RCAchangeIslandButton = RCAchangeIslandButton
+        self.defaultChangeIslandButton = defaultChangeIslandButton
 
         vbox.addStretch(1)
 
@@ -670,6 +678,9 @@ class CardiacEditBox(EditorLib.EditBox):
 
     def onRCAchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(5)
+
+    def onDefaultChangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(1)
 
     def changeIslandButtonClicked(self, label):
         self.selectEffect("ChangeIslandEffect")
