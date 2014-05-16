@@ -53,12 +53,12 @@ class CardiacAgatstonMeasuresWidget:
         # import test image
         self.InputTestImageNode = slicer.util.getNode('p1_1')
         if not self.InputTestImageNode:
-            slicer.util.loadVolume('/tmp/p1_1.nii.gz')
+            slicer.util.loadVolume('/scratch/p1_1.nii.gz')
 
         # imports custom Slicer lookup color table file
         self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
         if not self.cardiacLutNode:
-            slicer.util.loadColorTable('/tmp/cardiacLUT.ctbl')
+            slicer.util.loadColorTable('/scratch/cardiacLUT.ctbl')
 
     def setup(self):
         # Instantiate and connect widgets ...
@@ -130,76 +130,11 @@ class CardiacAgatstonMeasuresWidget:
         self.measuresFormLayout.addRow(thresholdButton)
         thresholdButton.connect('clicked(bool)', self.onThresholdButtonClicked)
 
-        # The Input Left Main (LM) Label Selector
-        LMchangeIslandButton = qt.QPushButton("LM")
-        LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
-        self.labelsFormLayout.addRow(LMchangeIslandButton)
-        LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
-
-        # The Input Left Arterial Descending (LAD) Label Selector
-        LADchangeIslandButton = qt.QPushButton("LAD")
-        LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
-        self.labelsFormLayout.addRow(LADchangeIslandButton)
-        LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
-
-        # The Input Left Circumflex (LCX) Label Selector
-        LCXchangeIslandButton = qt.QPushButton("LCX")
-        LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
-        self.labelsFormLayout.addRow(LCXchangeIslandButton)
-        LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
-
-        # The Input Right Coronary Artery (RCA) Label Selector
-        RCAchangeIslandButton = qt.QPushButton("RCA")
-        RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
-        self.labelsFormLayout.addRow(RCAchangeIslandButton)
-        RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
-
-        # Quit Label Changer (LX, LAD, LCX, RCA) Button
-        quitLabelChanger = qt.QPushButton("Quit Label Changer (LX, LAD, LCX, RCA)")
-        quitLabelChanger.toolTip = "Click to stop any of the change label buttons"
-        self.labelsFormLayout.addRow(quitLabelChanger)
-        quitLabelChanger.connect('clicked(bool)', self.onQuitLabelChangerClicked)
-
         # Add vertical spacer
         self.layout.addStretch(1)
         
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
-        self.LMchangeIslandButton = LMchangeIslandButton
-        self.LADchangeIslandButton = LADchangeIslandButton
-        self.LCXchangeIslandButton = LCXchangeIslandButton
-        self.RCAchangeIslandButton = RCAchangeIslandButton
-        self.quitLabelChanger = quitLabelChanger
-
-    def onLMchangeIslandButtonClicked(self):
-        self.changeIslandButtonClicked(2)
-
-    def onLADchangeIslandButtonClicked(self):
-        self.changeIslandButtonClicked(3)
-
-    def onLCXchangeIslandButtonClicked(self):
-        self.changeIslandButtonClicked(4)
-
-    def onRCAchangeIslandButtonClicked(self):
-        self.changeIslandButtonClicked(5)
-
-    def changeIslandButtonClicked(self, label):
-        lm = slicer.app.layoutManager()
-        changeIslandOptions = EditorLib.ChangeIslandEffectOptions()
-        changeIslandOptions.setMRMLDefaults()
-        changeIslandOptions.__del__()
-        sliceWidget = lm.sliceWidget('Red')
-        self.editUtil.setLabel(label)
-        self.changeIslandTool = EditorLib.ChangeIslandEffectTool(sliceWidget)
-        self.changeIslandTool.processEvent()
-
-    def onQuitLabelChangerClicked(self):
-        print 'onQuitLabelChangerClicked'
-        print self.changeIslandTool
-        self.changeIslandTool.cleanup()
-        changeIslandOptions = EditorLib.ChangeIslandEffectOptions()
-        changeIslandOptions.destroy()
-        self.changeIslandTool = None
 
     def onThresholdButtonClicked(self):
         if not self.KEV120.checked and not self.KEV80.checked:
@@ -664,6 +599,30 @@ class CardiacEditBox(EditorLib.EditBox):
         self.createButtonRow( ("ChangeIslandEffect", "DefaultTool"), rowLabel="ChangeIsland/Default Tool: " )
         self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
 
+        # The Input Left Main (LM) Label Selector
+        LMchangeIslandButton = qt.QPushButton("LM")
+        LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
+        self.parent.layout().addWidget(LMchangeIslandButton)
+        LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
+
+        # The Input Left Arterial Descending (LAD) Label Selector
+        LADchangeIslandButton = qt.QPushButton("LAD")
+        LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
+        self.parent.layout().addWidget(LADchangeIslandButton)
+        LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
+
+        # The Input Left Circumflex (LCX) Label Selector
+        LCXchangeIslandButton = qt.QPushButton("LCX")
+        LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
+        self.parent.layout().addWidget(LCXchangeIslandButton)
+        LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
+
+        # The Input Right Coronary Artery (RCA) Label Selector
+        RCAchangeIslandButton = qt.QPushButton("RCA")
+        RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
+        self.parent.layout().addWidget(RCAchangeIslandButton)
+        RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
+
         extensions = []
         for k in slicer.modules.editorExtensions:
             extensions.append(k)
@@ -683,6 +642,26 @@ class CardiacEditBox(EditorLib.EditBox):
         self.toolsActiveToolName.setStyleSheet("background-color: rgb(232,230,235)")
         self.toolsActiveToolFrame.layout().addWidget(self.toolsActiveToolName)
 
+        self.LMchangeIslandButton = LMchangeIslandButton
+        self.LADchangeIslandButton = LADchangeIslandButton
+        self.LCXchangeIslandButton = LCXchangeIslandButton
+        self.RCAchangeIslandButton = RCAchangeIslandButton
+
         vbox.addStretch(1)
 
         self.updateUndoRedoButtons()
+
+    def onLMchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(2)
+
+    def onLADchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(3)
+
+    def onLCXchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(4)
+
+    def onRCAchangeIslandButtonClicked(self):
+        self.changeIslandButtonClicked(5)
+
+    def changeIslandButtonClicked(self, label):
+        self.editUtil.setLabel(label)
