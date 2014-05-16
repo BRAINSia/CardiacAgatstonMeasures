@@ -127,6 +127,7 @@ class CardiacAgatstonMeasuresWidget:
         # Threshold button
         thresholdButton = qt.QPushButton("Threshold Volume")
         thresholdButton.toolTip = "Threshold the selected Input Volume"
+        thresholdButton.setStyleSheet("background-color: rgb(230,241,255)")
         self.measuresFormLayout.addRow(thresholdButton)
         thresholdButton.connect('clicked(bool)', self.onThresholdButtonClicked)
 
@@ -283,6 +284,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         # Apply button
         self.applyButton = qt.QPushButton("Apply")
         self.applyButton.toolTip = "Calculate Statistics."
+        self.applyButton.setStyleSheet("background-color: rgb(230,241,255)")
         self.applyButton.enabled = True
         self.parent.layout().addWidget(self.applyButton)
 
@@ -311,6 +313,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         # Save button
         self.saveButton = qt.QPushButton("Save")
         self.saveButton.toolTip = "Calculate Statistics."
+        self.saveButton.setStyleSheet("background-color: rgb(230,241,255)")
         self.saveButton.enabled = False
         self.parent.layout().addWidget(self.saveButton)
 
@@ -602,7 +605,7 @@ class CardiacEditBox(EditorLib.EditBox):
         # The Input Left Main (LM) Label Selector
         LMchangeIslandButton = qt.QPushButton("LM")
         LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
-        LMchangeIslandButton.setStyleSheet("background-color: rgb(216,0,237)")
+        LMchangeIslandButton.setStyleSheet("background-color: rgb(220,0,250)")
         self.mainFrame.layout().addWidget(LMchangeIslandButton)
         LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
 
@@ -623,7 +626,7 @@ class CardiacEditBox(EditorLib.EditBox):
         # The Input Right Coronary Artery (RCA) Label Selector
         RCAchangeIslandButton = qt.QPushButton("RCA")
         RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
-        RCAchangeIslandButton.setStyleSheet("background-color: rgb(204,0,38)")
+        RCAchangeIslandButton.setStyleSheet("background-color: rgb(222,0,20)")
         self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
