@@ -599,35 +599,33 @@ class CardiacEditBox(EditorLib.EditBox):
         self.icons = {}
         self.callbacks = {}
 
-        # create all of the buttons
-        # createButtonRow() ensures that only effects in self.effects are exposed,
-
-        self.createButtonRow( ("ChangeIslandEffect", "DefaultTool"), rowLabel="ChangeIsland/Default Tool: " )
-        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint"), rowLabel="Undo/Redo: " )
-
         # The Input Left Main (LM) Label Selector
         LMchangeIslandButton = qt.QPushButton("LM")
         LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
-        self.parent.layout().addWidget(LMchangeIslandButton)
+        self.mainFrame.layout().addWidget(LMchangeIslandButton)
         LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
 
         # The Input Left Arterial Descending (LAD) Label Selector
         LADchangeIslandButton = qt.QPushButton("LAD")
         LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
-        self.parent.layout().addWidget(LADchangeIslandButton)
+        self.mainFrame.layout().addWidget(LADchangeIslandButton)
         LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
 
         # The Input Left Circumflex (LCX) Label Selector
         LCXchangeIslandButton = qt.QPushButton("LCX")
         LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
-        self.parent.layout().addWidget(LCXchangeIslandButton)
+        self.mainFrame.layout().addWidget(LCXchangeIslandButton)
         LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
 
         # The Input Right Coronary Artery (RCA) Label Selector
         RCAchangeIslandButton = qt.QPushButton("RCA")
         RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
-        self.parent.layout().addWidget(RCAchangeIslandButton)
+        self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
+
+        # create all of the buttons
+        # createButtonRow() ensures that only effects in self.effects are exposed,
+        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint", "DefaultTool"), rowLabel="Undo/Redo/Default: " )
 
         extensions = []
         for k in slicer.modules.editorExtensions:
