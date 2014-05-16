@@ -602,24 +602,28 @@ class CardiacEditBox(EditorLib.EditBox):
         # The Input Left Main (LM) Label Selector
         LMchangeIslandButton = qt.QPushButton("LM")
         LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
+        LMchangeIslandButton.setStyleSheet("background-color: rgb(216,0,237)")
         self.mainFrame.layout().addWidget(LMchangeIslandButton)
         LMchangeIslandButton.connect('clicked(bool)', self.onLMchangeIslandButtonClicked)
 
         # The Input Left Arterial Descending (LAD) Label Selector
         LADchangeIslandButton = qt.QPushButton("LAD")
         LADchangeIslandButton.toolTip = "Label - Left Arterial Descending (LAD)"
+        LADchangeIslandButton.setStyleSheet("background-color: rgb(246,243,48)")
         self.mainFrame.layout().addWidget(LADchangeIslandButton)
         LADchangeIslandButton.connect('clicked(bool)', self.onLADchangeIslandButtonClicked)
 
         # The Input Left Circumflex (LCX) Label Selector
         LCXchangeIslandButton = qt.QPushButton("LCX")
         LCXchangeIslandButton.toolTip = "Label - Left Circumflex (LCX)"
+        LCXchangeIslandButton.setStyleSheet("background-color: rgb(94,170,200)")
         self.mainFrame.layout().addWidget(LCXchangeIslandButton)
         LCXchangeIslandButton.connect('clicked(bool)', self.onLCXchangeIslandButtonClicked)
 
         # The Input Right Coronary Artery (RCA) Label Selector
         RCAchangeIslandButton = qt.QPushButton("RCA")
         RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
+        RCAchangeIslandButton.setStyleSheet("background-color: rgb(204,0,38)")
         self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
