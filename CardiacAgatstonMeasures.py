@@ -161,7 +161,9 @@ class CardiacAgatstonMeasuresWidget:
         self.localCardiacEditorWidget.setup()
 
         # Adds Label Statistics Widget to Module
-        localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80, parent=self.parent)
+        localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
+                                                             self.localCardiacEditorWidget,
+                                                             parent=self.parent)
         localLabelStatisticsWidget.setup()
 
     def onReload(self,moduleName="CardiacAgatstonMeasures"):
@@ -249,7 +251,7 @@ class CardiacAgatstonMeasuresWidget:
         setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
-    def __init__(self, KEV120, KEV80, parent=None):
+    def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
         self.chartOptions = ("Agatston Score", "Count", "Volume mm^3", "Volume cc", "Min", "Max", "Mean", "StdDev")
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -264,6 +266,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.fileDialog = None
         self.KEV120 = KEV120
         self.KEV80 = KEV80
+        self.localCardiacEditorWidget = localCardiacEditorWidget
         if not parent:
             self.setup()
             self.grayscaleSelector.setMRMLScene(slicer.mrmlScene)
@@ -327,6 +330,9 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
                 "Label Statistics", "Volumes do not have the same geometry.")
             return
 
+        # selects default tool to stop the ChangeIslandTool
+        self.localCardiacEditorWidget.toolsBox.selectEffect("DefaultTool")
+        
         self.applyButton.text = "Working..."
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
