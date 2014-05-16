@@ -332,7 +332,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
 
         # selects default tool to stop the ChangeIslandTool
         self.localCardiacEditorWidget.toolsBox.selectEffect("DefaultTool")
-        
+
         self.applyButton.text = "Working..."
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
@@ -670,4 +670,5 @@ class CardiacEditBox(EditorLib.EditBox):
         self.changeIslandButtonClicked(5)
 
     def changeIslandButtonClicked(self, label):
+        self.selectEffect("ChangeIslandEffect")
         self.editUtil.setLabel(label)
