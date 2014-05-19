@@ -353,11 +353,19 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         if not self.fileDialog:
             self.fileDialog = qt.QFileDialog(self.parent)
             self.fileDialog.options = self.fileDialog.DontUseNativeDialog
-            self.fileDialog.acceptMode = self.fileDialog.AcceptSave
-            self.fileDialog.defaultSuffix = "csv"
-            self.fileDialog.setNameFilter("Comma Separated Values (*.csv)")
-            self.fileDialog.connect("fileSelected(QString)", self.onFileSelected)
+            self.fileDialog.acceptMode = self.fileDialog.AcceptOpen
+            self.fileDialog.fileMode = self.fileDialog.DirectoryOnly
+            self.fileDialog.connect("fileSelected(QString)", self.onDirSelected)
         self.fileDialog.show()
+
+    def onDirSelected(self, dirName):
+        # saves the current scene to selected folder
+        l = slicer.app.applicationLogic()
+        l.SaveSceneToSlicerDataBundleDirectory(dirName, None)
+
+        # saves the csv files to selected folder
+        csvFileName = os.path.join(dirName, "{0}_Agatston_Scores.csv".format(self.grayscaleNode.GetName()))
+        self.logic.saveStats(csvFileName)
 
     def populateStats(self):
         if not self.logic:
