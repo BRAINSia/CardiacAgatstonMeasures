@@ -1,4 +1,5 @@
 from __main__ import vtk, qt, ctk, slicer
+import os
 import SimpleITK as sitk
 import sitkUtils as su
 import EditorLib
@@ -346,6 +347,18 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         self.saveButton.enabled = True
         self.applyButton.text = "Apply"
 
+    def onSave(self):
+        """save the label statistics
+        """
+        if not self.fileDialog:
+            self.fileDialog = qt.QFileDialog(self.parent)
+            self.fileDialog.options = self.fileDialog.DontUseNativeDialog
+            self.fileDialog.acceptMode = self.fileDialog.AcceptSave
+            self.fileDialog.defaultSuffix = "csv"
+            self.fileDialog.setNameFilter("Comma Separated Values (*.csv)")
+            self.fileDialog.connect("fileSelected(QString)", self.onFileSelected)
+        self.fileDialog.show()
+
     def populateStats(self):
         if not self.logic:
             return
@@ -626,7 +639,7 @@ class CardiacEditBox(EditorLib.EditBox):
         # The Input Right Coronary Artery (RCA) Label Selector
         RCAchangeIslandButton = qt.QPushButton("RCA")
         RCAchangeIslandButton.toolTip = "Label - Right Coronary Artery (RCA)"
-        RCAchangeIslandButton.setStyleSheet("background-color: rgb(222,0,20)")
+        RCAchangeIslandButton.setStyleSheet("background-color: rgb(222,60,30)")
         self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
