@@ -359,6 +359,16 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def onSave(self):
         """save the label statistics
         """
+        (inputVolumeAndKev, dirName) = self.createDir()
+        # saves the current scene to selected folder
+        l = slicer.app.applicationLogic()
+        l.SaveSceneToSlicerDataBundleDirectory(dirName, None)
+
+        # saves the csv files to selected folder
+        csvFileName = os.path.join(dirName, "{0}_Agatston_Scores.csv".format(inputVolumeAndKev))
+        self.logic.saveStats(csvFileName)
+
+    def createDir(self):
         if self.KEV80.checked:
             inputVolumeAndKev = "{0}_80KEV".format(self.grayscaleNode.GetName())
         elif self.KEV120.checked:
@@ -367,14 +377,7 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         dirName = os.path.join(baseDirName, inputVolumeAndKev)
         if not os.path.exists(dirName):
             os.mkdir(dirName)
-            
-        # saves the current scene to selected folder
-        l = slicer.app.applicationLogic()
-        l.SaveSceneToSlicerDataBundleDirectory(dirName, None)
-
-        # saves the csv files to selected folder
-        csvFileName = os.path.join(dirName, "{0}_Agatston_Scores.csv".format(inputVolumeAndKev))
-        self.logic.saveStats(csvFileName)
+        return inputVolumeAndKev, dirName
 
     def populateStats(self):
         if not self.logic:
