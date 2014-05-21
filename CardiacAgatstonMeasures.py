@@ -359,21 +359,21 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def onSave(self):
         """save the label statistics
         """
-        if not self.fileDialog:
-            self.fileDialog = qt.QFileDialog(self.parent)
-            self.fileDialog.options = self.fileDialog.DontUseNativeDialog
-            self.fileDialog.acceptMode = self.fileDialog.AcceptOpen
-            self.fileDialog.fileMode = self.fileDialog.DirectoryOnly
-            self.fileDialog.connect("fileSelected(QString)", self.onDirSelected)
-        self.fileDialog.show()
-
-    def onDirSelected(self, dirName):
+        if self.KEV80.checked:
+            inputVolumeAndKev = "{0}_80KEV".format(self.grayscaleNode.GetName())
+        elif self.KEV120.checked:
+            inputVolumeAndKev = "{0}_120KEV".format(self.grayscaleNode.GetName())
+        baseDirName = "/Shared/johnsonhj/HDNI/20130422_Sigurdsson/2014PatientDataTestDir/results"
+        dirName = os.path.join(baseDirName, inputVolumeAndKev)
+        if not os.path.exists(dirName):
+            os.mkdir(dirName)
+            
         # saves the current scene to selected folder
         l = slicer.app.applicationLogic()
         l.SaveSceneToSlicerDataBundleDirectory(dirName, None)
 
         # saves the csv files to selected folder
-        csvFileName = os.path.join(dirName, "{0}_Agatston_Scores.csv".format(self.grayscaleNode.GetName()))
+        csvFileName = os.path.join(dirName, "{0}_Agatston_Scores.csv".format(inputVolumeAndKev))
         self.logic.saveStats(csvFileName)
 
     def populateStats(self):
