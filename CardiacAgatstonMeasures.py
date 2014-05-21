@@ -31,7 +31,7 @@ class CardiacAgatstonMeasures:
 class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
-        self.thresholdValue = 130
+        self.thresholdValue = None
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
         self.inputImageNode = None
@@ -144,10 +144,16 @@ class CardiacAgatstonMeasuresWidget:
                 "Select KEV", "The KEV (80 or 120) must be selected to continue.")
             return
 
+        # Sets minimum threshold value based on KEV80 or KEV120
+        if self.KEV80.checked:
+            self.thresholdValue = 167
+        elif self.KEV120.checked:
+            self.thresholdValue = 130
+
         print "Thresholding at {0}".format(self.thresholdValue)
         self.inputImageNode = self.inputSelector.currentNode()
         inputVolumeName = su.PullFromSlicer(self.inputImageNode.GetName())
-        thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 2000)
+        thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 4000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage,'calcium')
 
