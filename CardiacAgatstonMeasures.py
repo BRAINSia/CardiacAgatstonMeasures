@@ -178,6 +178,9 @@ class CardiacAgatstonMeasuresWidget:
         import sitkUtils as su
         import EditorLib
 
+        # clears the mrml scene
+        slicer.mrmlScene.Clear(0)
+
         # first, destroy the current plugin, since it will
         # contain subclasses of the RegistrationLib modules
         if self.currentRegistrationInterface:
@@ -660,7 +663,7 @@ class CardiacEditBox(EditorLib.EditBox):
 
         # create all of the buttons
         # createButtonRow() ensures that only effects in self.effects are exposed,
-        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint", "DefaultTool"), rowLabel="Undo/Redo/Default: " )
+        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint", "DefaultTool", "PaintEffect"), rowLabel="Undo/Redo/Default: " )
 
         extensions = []
         for k in slicer.modules.editorExtensions:
