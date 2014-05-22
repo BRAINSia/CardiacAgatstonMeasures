@@ -144,21 +144,24 @@ class CardiacAgatstonMeasuresWidget:
                 "Select KEV", "The KEV (80 or 120) must be selected to continue.")
             return
 
+        self.inputImageNode = self.inputSelector.currentNode()
+        inputVolumeName = self.inputImageNode.GetName()
         # Sets minimum threshold value based on KEV80 or KEV120
         if self.KEV80.checked:
             self.thresholdValue = 167
+            calciumName = "{0}_80KEV_{1}HU_Calcium_Label".format(inputVolumeName, self.thresholdValue)
         elif self.KEV120.checked:
             self.thresholdValue = 130
+            calciumName = "{0}_120KEV_{1}HU_Calcium_Label".format(inputVolumeName, self.thresholdValue)
 
         print "Thresholding at {0}".format(self.thresholdValue)
-        self.inputImageNode = self.inputSelector.currentNode()
-        inputVolumeName = su.PullFromSlicer(self.inputImageNode.GetName())
-        thresholdImage = sitk.BinaryThreshold(inputVolumeName, self.thresholdValue, 4000)
+        inputVolume = su.PullFromSlicer(inputVolumeName)
+        thresholdImage = sitk.BinaryThreshold(inputVolume, self.thresholdValue, 4000)
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
-        su.PushLabel(castedThresholdImage,'calcium')
+        su.PushLabel(castedThresholdImage, calciumName)
 
         # Set the color lookup table (LUT) to the custom cardiacLUT
-        self.calciumLabelNode = slicer.util.getNode('calcium')
+        self.calciumLabelNode = slicer.util.getNode(calciumName)
         self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
         cardiacLutID = self.cardiacLutNode.GetID()
         calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
