@@ -37,6 +37,7 @@ class CardiacAgatstonMeasuresWidget:
         self.inputImageNode = None
         self.calciumLabelNode = None
         self.cardiacLutNode = None
+        self.localCardiacEditorWidget = None
 
         if not parent:
             self.parent = slicer.qMRMLWidget()
@@ -186,6 +187,10 @@ class CardiacAgatstonMeasuresWidget:
         import SimpleITK as sitk
         import sitkUtils as su
         import EditorLib
+
+        # selects default tool to stop the ChangeIslandTool
+        if self.localCardiacEditorWidget:
+            self.localCardiacEditorWidget.toolsBox.selectEffect("DefaultTool")
 
         # clears the mrml scene
         slicer.mrmlScene.Clear(0)
