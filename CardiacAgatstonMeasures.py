@@ -620,6 +620,35 @@ class CardiacEditorWidget(Editor.EditorWidget):
         self.editBoxFrame.setLayout(qt.QVBoxLayout())
         self.effectsToolsFrame.layout().addWidget(self.editBoxFrame)
         self.toolsBox = CardiacEditBox(self.editBoxFrame, optionsFrame=self.effectOptionsFrame)
+        self.turnOffLightboxes()
+        self.installShortcutKeys()
+
+    def installShortcutKeys(self):
+        """Turn on editor-wide shortcuts.  These are active independent
+        of the currently selected effect."""
+        Key_Escape = 0x01000000 # not in PythonQt
+        Key_Space = 0x20 # not in PythonQt
+        self.shortcuts = []
+        keysAndCallbacks = (
+            ('e', self.editUtil.toggleLabel),
+            ('z', self.toolsBox.undoRedo.undo),
+            ('y', self.toolsBox.undoRedo.redo),
+            ('h', self.editUtil.toggleCrosshair),
+            ('o', self.editUtil.toggleLabelOutline),
+            ('t', self.editUtil.toggleForegroundBackground),
+            (Key_Escape, self.toolsBox.defaultEffect),
+            ('p', lambda : self.toolsBox.selectEffect('PaintEffect')),
+            ('d', lambda : self.toolsBox.selectEffect('DrawEffect')),
+            ('w', lambda : self.toolsBox.selectEffect('WandEffect')),
+            ('r', lambda : self.toolsBox.selectEffect('RectangleEffect')),
+            # ('c', self.toolsColor.showColorBox),
+            (Key_Space, self.toolsBox.toggleFloatingMode),
+            )
+        for key,callback in keysAndCallbacks:
+            shortcut = qt.QShortcut(slicer.util.mainWindow())
+            shortcut.setKey( qt.QKeySequence(key) )
+            shortcut.connect( 'activated()', callback )
+            self.shortcuts.append(shortcut)
 
 class CardiacEditBox(EditorLib.EditBox):
 
