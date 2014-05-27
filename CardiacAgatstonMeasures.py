@@ -537,7 +537,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         #Just temporary code, will calculate statistics and show in table
         print "Calculating Statistics"
         calcium = su.PullFromSlicer(self.labelNode.GetName())
-        all_labels = [0, 1, 2, 3, 4, 5]
+        all_labels = [0, 1, 2, 3, 4, 5, 6]
         heart = su.PullFromSlicer(self.grayscaleNode.GetName())
         sliceAgatstonPerLabel = self.computeSlicewiseAgatstonScores(calcium, heart, all_labels)
         #print sliceAgatstonPerLabel
@@ -630,7 +630,6 @@ class CardiacEditorWidget(Editor.EditorWidget):
         Key_Space = 0x20 # not in PythonQt
         self.shortcuts = []
         keysAndCallbacks = (
-            ('e', self.editUtil.toggleLabel),
             ('z', self.toolsBox.undoRedo.undo),
             ('y', self.toolsBox.undoRedo.redo),
             ('h', self.editUtil.toggleCrosshair),
