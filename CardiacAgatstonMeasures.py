@@ -638,15 +638,11 @@ class CardiacEditorWidget(Editor.EditorWidget):
             ('t', self.editUtil.toggleForegroundBackground),
             (Key_Escape, self.toolsBox.defaultEffect),
             ('p', lambda : self.toolsBox.selectEffect('PaintEffect')),
-            ('d', lambda : self.toolsBox.selectEffect('DrawEffect')),
-            ('w', lambda : self.toolsBox.selectEffect('WandEffect')),
-            ('r', lambda : self.toolsBox.selectEffect('RectangleEffect')),
             ('1', self.toolsBox.onLMchangeIslandButtonClicked),
             ('2', self.toolsBox.onLADchangeIslandButtonClicked),
             ('3', self.toolsBox.onLCXchangeIslandButtonClicked),
             ('4', self.toolsBox.onRCAchangeIslandButtonClicked),
-            # ('c', self.toolsColor.showColorBox),
-            (Key_Space, self.toolsBox.toggleFloatingMode),
+            ('5', self.toolsBox.onDefaultChangeIslandButtonClicked),
             )
         for key,callback in keysAndCallbacks:
             shortcut = qt.QShortcut(slicer.util.mainWindow())
