@@ -544,9 +544,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         heart = su.PullFromSlicer(self.grayscaleNode.GetName())
         sliceAgatstonPerLabel = self.computeSlicewiseAgatstonScores(calcium, heart, all_labels)
         #print sliceAgatstonPerLabel
-        print "-"*50
         self.computeOverallAgatstonScore(sliceAgatstonPerLabel)
-        print "-"*50
 
     def computeOverallAgatstonScore(self, sliceAgatstonPerLabel):
         self.AgatstonScoresPerLabel = {}
@@ -555,9 +553,9 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         self.AgatstonScoresPerLabel[1] = 0
         for (label, scores) in sliceAgatstonPerLabel.items():
             labelScore =  sum(scores)
-            print "Label", label, ": Agatston Score = ", labelScore
             self.AgatstonScoresPerLabel[label] = labelScore
-        print "\nTOTAL Agatston Score = ", sum(self.AgatstonScoresPerLabel.values())
+        # label 6 is the total of all of labels 2 - 5
+        self.AgatstonScoresPerLabel[6] = sum(self.AgatstonScoresPerLabel.values())
 
     def KEV2AgatstonIndex(self, kev):
         AgatstonIndex = 0.0
