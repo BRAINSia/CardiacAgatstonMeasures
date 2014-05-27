@@ -466,7 +466,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
         self.KEV120 = KEV120
         self.calculateAgatstonScores()
 
-        for i in xrange(lo,hi+1):
+        for i in xrange(lo,7):
             # skip indices 0 (background) and 1 (default threshold pixels)
             # because these are not calcium and do not have an Agatston score
             if i == 0 or i == 1:
@@ -488,7 +488,10 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
             thresholder.SetInValue(1)
             thresholder.SetOutValue(0)
             thresholder.ReplaceOutOn()
-            thresholder.ThresholdBetween(i,i)
+            if i != 6:
+                thresholder.ThresholdBetween(i,i)
+            else: # label 6 is the total calcium pixels in labels 2, 3, 4 and 5
+                thresholder.ThresholdBetween(2,5)
             thresholder.SetOutputScalarType(grayscaleNode.GetImageData().GetScalarType())
             thresholder.Update()
 
