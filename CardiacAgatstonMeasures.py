@@ -173,6 +173,13 @@ class CardiacAgatstonMeasuresWidget:
         self.localCardiacEditorWidget.setup()
         self.localCardiacEditorWidget.enter()
 
+        # sets parameters for paint specific to KEV threshold level
+        parameterNode = self.editUtil.getParameterNode()
+        parameterNode.SetParameter("LabelEffect,paintOver","1")
+        parameterNode.SetParameter("LabelEffect,paintThreshold","1")
+        parameterNode.SetParameter("LabelEffect,paintThresholdMin","{0}".format(self.thresholdValue))
+        parameterNode.SetParameter("LabelEffect,paintThresholdMax","4000")
+
         # Adds Label Statistics Widget to Module
         localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
                                                              self.localCardiacEditorWidget,
