@@ -171,6 +171,7 @@ class CardiacAgatstonMeasuresWidget:
         # Creates and adds the custom Editor Widget to the module
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
+        self.localCardiacEditorWidget.enter()
 
         # Adds Label Statistics Widget to Module
         localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
@@ -190,7 +191,7 @@ class CardiacAgatstonMeasuresWidget:
 
         # selects default tool to stop the ChangeIslandTool
         if self.localCardiacEditorWidget:
-            self.localCardiacEditorWidget.toolsBox.selectEffect("DefaultTool")
+            self.localCardiacEditorWidget.exit()
 
         # clears the mrml scene
         slicer.mrmlScene.Clear(0)
@@ -621,8 +622,6 @@ class CardiacEditorWidget(Editor.EditorWidget):
         self.editBoxFrame.setLayout(qt.QVBoxLayout())
         self.effectsToolsFrame.layout().addWidget(self.editBoxFrame)
         self.toolsBox = CardiacEditBox(self.editBoxFrame, optionsFrame=self.effectOptionsFrame)
-        self.turnOffLightboxes()
-        self.installShortcutKeys()
 
     def installShortcutKeys(self):
         """Turn on editor-wide shortcuts.  These are active independent
