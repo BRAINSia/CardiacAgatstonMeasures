@@ -645,11 +645,11 @@ class CardiacEditorWidget(Editor.EditorWidget):
             ('t', self.editUtil.toggleForegroundBackground),
             (Key_Escape, self.toolsBox.defaultEffect),
             ('p', lambda : self.toolsBox.selectEffect('PaintEffect')),
-            ('1', self.toolsBox.onLMchangeIslandButtonClicked),
-            ('2', self.toolsBox.onLADchangeIslandButtonClicked),
-            ('3', self.toolsBox.onLCXchangeIslandButtonClicked),
-            ('4', self.toolsBox.onRCAchangeIslandButtonClicked),
-            ('5', self.toolsBox.onDefaultChangeIslandButtonClicked),
+            ('1', self.toolsBox.onDefaultChangeIslandButtonClicked),
+            ('2', self.toolsBox.onLMchangeIslandButtonClicked),
+            ('3', self.toolsBox.onLADchangeIslandButtonClicked),
+            ('4', self.toolsBox.onLCXchangeIslandButtonClicked),
+            ('5', self.toolsBox.onRCAchangeIslandButtonClicked),
             )
         for key,callback in keysAndCallbacks:
             shortcut = qt.QShortcut(slicer.util.mainWindow())
@@ -679,6 +679,13 @@ class CardiacEditBox(EditorLib.EditBox):
         self.icons = {}
         self.callbacks = {}
 
+        # The Default Label Selector
+        defaultChangeIslandButton = qt.QPushButton("Default")
+        defaultChangeIslandButton.toolTip = "Label - Default"
+        defaultChangeIslandButton.setStyleSheet("background-color: rgb(81,208,35)")
+        self.mainFrame.layout().addWidget(defaultChangeIslandButton)
+        defaultChangeIslandButton.connect('clicked(bool)', self.onDefaultChangeIslandButtonClicked)
+
         # The Input Left Main (LM) Label Selector
         LMchangeIslandButton = qt.QPushButton("LM")
         LMchangeIslandButton.toolTip = "Label - Left Main (LM)"
@@ -707,16 +714,11 @@ class CardiacEditBox(EditorLib.EditBox):
         self.mainFrame.layout().addWidget(RCAchangeIslandButton)
         RCAchangeIslandButton.connect('clicked(bool)', self.onRCAchangeIslandButtonClicked)
 
-        # The Default Label Selector
-        defaultChangeIslandButton = qt.QPushButton("Default")
-        defaultChangeIslandButton.toolTip = "Label - Default"
-        defaultChangeIslandButton.setStyleSheet("background-color: rgb(81,208,35)")
-        self.mainFrame.layout().addWidget(defaultChangeIslandButton)
-        defaultChangeIslandButton.connect('clicked(bool)', self.onDefaultChangeIslandButtonClicked)
-
         # create all of the buttons
         # createButtonRow() ensures that only effects in self.effects are exposed,
-        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint", "DefaultTool", "PaintEffect"), rowLabel="Undo/Redo/Default: " )
+        self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint",
+                               "DefaultTool", "PaintEffect"),
+                              rowLabel="Undo/Redo/Default: " )
 
         extensions = []
         for k in slicer.modules.editorExtensions:
