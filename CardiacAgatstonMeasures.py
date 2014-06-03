@@ -610,12 +610,8 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 if slice_ls.HasLabel(label):
                     slice_count = slice_ls.GetCount(label)
                     slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
-                    #slice_volume = slice_area*ImageSpacing[2]
-                    #slice_mean = slice_ls.GetMean(label)
                     slice_max = slice_ls.GetMaximum(label)
-                    #print "label: ",label," index: ",index," slice area: ", slice_area," ", slice_max, " ", KEV2AgatstonIndex( slice_max )*slice_area
                     slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
-                    #slice_load = slice_mean
                     AgatstonValue = slice_Agatston
 
                 sliceAgatstonPerLabel[label].append(AgatstonValue)
