@@ -597,10 +597,8 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
             sliceAgatstonPerLabel[label]=list()
 
         for label in all_labels:
-            print "label",label, all_labels
             if label == 0 or label == 1:
                 continue
-            print "label after if 0 or 1",label, all_labels
             binaryThresholdFilterImage = sitk.BinaryThreshold(calcium, label, label)
             ConnectedComponentImage = sitk.ConnectedComponent(binaryThresholdFilterImage)
             RelabeledComponentImage = sitk.RelabelComponent(ConnectedComponentImage)
@@ -613,7 +611,6 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 slice_ls.Execute(slice_img,slice_calcium)
                 compontent_labels = slice_ls.GetValidLabels()
                 for sublabel in compontent_labels:
-                    print "sublabel", sublabel, "compontent_labels",compontent_labels
                     if sublabel == 0:
                         continue
                     AgatstonValue = 0.0
@@ -622,7 +619,6 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                         slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
                         slice_max = slice_ls.GetMaximum(sublabel)
                         slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
-                        print "slice_count",slice_count,"slice_area",slice_area,"slice_max",slice_max,"slice_Agatston",slice_Agatston
                         AgatstonValue = slice_Agatston
 
                     sliceAgatstonPerLabel[label].append(AgatstonValue)
