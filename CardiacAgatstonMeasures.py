@@ -596,25 +596,37 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 continue
             sliceAgatstonPerLabel[label]=list()
 
-        ImageSpacing = calcium.GetSpacing()
-        ImageIndex=range(0,calcium.GetSize()[2])
-        for index in ImageIndex:
-            slice_calcium = calcium[:,:,index]
-            slice_img = heart[:,:,index]
-            slice_ls=sitk.LabelStatisticsImageFilter()
-            slice_ls.Execute(slice_img,slice_calcium)
-            for label in all_labels:
-                if label == 0 or label == 1:
-                    continue
-                AgatstonValue = 0.0
-                if slice_ls.HasLabel(label):
-                    slice_count = slice_ls.GetCount(label)
-                    slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
-                    slice_max = slice_ls.GetMaximum(label)
-                    slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
-                    AgatstonValue = slice_Agatston
+        for label in all_labels:
+            print "label",label, all_labels
+            if label == 0 or label == 1:
+                continue
+            print "label after if 0 or 1",label, all_labels
+            binaryThresholdFilterImage = sitk.BinaryThreshold(calcium, label, label)
+            ConnectedComponentImage = sitk.ConnectedComponent(binaryThresholdFilterImage)
+            RelabeledComponentImage = sitk.RelabelComponent(ConnectedComponentImage)
+            ImageSpacing = RelabeledComponentImage.GetSpacing()
+            ImageIndex = range(0, RelabeledComponentImage.GetSize()[2])
+            for index in ImageIndex:
+                slice_calcium = RelabeledComponentImage[:,:,index]
+                slice_img = heart[:,:,index]
+                slice_ls = sitk.LabelStatisticsImageFilter()
+                slice_ls.Execute(slice_img,slice_calcium)
+                compontent_labels = slice_ls.GetValidLabels()
+                for sublabel in compontent_labels:
+                    print "sublabel", sublabel, "compontent_labels",compontent_labels
+                    if sublabel == 0:
+                        continue
+                    AgatstonValue = 0.0
+                    if slice_ls.HasLabel(sublabel):
+                        slice_count = slice_ls.GetCount(sublabel)
+                        slice_area = slice_count*ImageSpacing[0]*ImageSpacing[1]
+                        slice_max = slice_ls.GetMaximum(sublabel)
+                        slice_Agatston = slice_area * self.KEV2AgatstonIndex( slice_max )
+                        print "slice_count",slice_count,"slice_area",slice_area,"slice_max",slice_max,"slice_Agatston",slice_Agatston
+                        AgatstonValue = slice_Agatston
 
-                sliceAgatstonPerLabel[label].append(AgatstonValue)
+                    sliceAgatstonPerLabel[label].append(AgatstonValue)
+        print sliceAgatstonPerLabel
         return sliceAgatstonPerLabel
 
 class CardiacEditorWidget(Editor.EditorWidget):
