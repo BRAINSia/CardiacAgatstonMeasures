@@ -606,7 +606,7 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 slice_img = heart[:,:,index]
                 slice_ls = sitk.LabelStatisticsImageFilter()
                 slice_ls.Execute(slice_img,slice_calcium)
-                compontent_labels = slice_ls.GetValidLabels()
+                compontent_labels = slice_ls.GetLabels()
                 for sublabel in compontent_labels:
                     if sublabel == 0:
                         continue
