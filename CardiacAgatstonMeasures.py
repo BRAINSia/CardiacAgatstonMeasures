@@ -606,7 +606,10 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                 slice_img = heart[:,:,index]
                 slice_ls = sitk.LabelStatisticsImageFilter()
                 slice_ls.Execute(slice_img,slice_calcium)
-                compontent_labels = slice_ls.GetLabels()
+                if sitk.Version().MajorVersion() > 0 or sitk.Version().MinorVersion() >= 9:
+                    compontent_labels = slice_ls.GetLabels()
+                else: #if sitk version < 0.9 then use older function call GetValidLabels
+                    compontent_labels = slice_ls.GetValidLabels()
                 for sublabel in compontent_labels:
                     if sublabel == 0:
                         continue
