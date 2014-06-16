@@ -211,7 +211,7 @@ class CardiacAgatstonMeasuresWidget:
     def onReload(self,moduleName="CardiacAgatstonMeasures"):
         """Generic reload method for any scripted module.
             ModuleWizard will subsitute correct default moduleName.
-            Note: customized for use in LandmarkRegistration
+            Note: customized for use in CardiacAgatstonModule
             """
         import imp, sys, os, slicer
 
@@ -222,61 +222,7 @@ class CardiacAgatstonMeasuresWidget:
         # clears the mrml scene
         slicer.mrmlScene.Clear(0)
 
-        # first, destroy the current plugin, since it will
-        # contain subclasses of the RegistrationLib modules
-        if self.currentRegistrationInterface:
-            self.currentRegistrationInterface.destroy()
-
-        # now reload the RegistrationLib source code
-        # - set source file path
-        # - load the module to the global space
-        filePath = eval('slicer.modules.%s.path' % moduleName.lower())
-        p = os.path.dirname(filePath)
-        if not sys.path.__contains__(p):
-            sys.path.insert(0,p)
-        for subModuleName in ("pqWidget", "Visualization", "Landmarks", ):
-            fp = open(filePath, "r")
-            globals()[subModuleName] = imp.load_module(subModuleName, fp, filePath, ('.py', 'r', imp.PY_SOURCE))
-            fp.close()
-
-        widgetName = moduleName + "Widget"
-
-        # now reload the widget module source code
-        # - set source file path
-        # - load the module to the global space
-        filePath = eval('slicer.modules.%s.path' % moduleName.lower())
-        p = os.path.dirname(filePath)
-        if not sys.path.__contains__(p):
-            sys.path.insert(0,p)
-        fp = open(filePath, "r")
-        globals()[moduleName] = imp.load_module(
-            moduleName, fp, filePath, ('.py', 'r', imp.PY_SOURCE))
-        fp.close()
-
-        # rebuild the widget
-        # - find and hide the existing widget
-        # - create a new widget in the existing parent
-        parent = slicer.util.findChildren(name='%s Reload' % moduleName)[0].parent().parent()
-        for child in parent.children():
-          try:
-            child.hide()
-          except AttributeError:
-            pass
-        # Remove spacer items
-        item = parent.layout().itemAt(0)
-        while item:
-          parent.layout().removeItem(item)
-          item = parent.layout().itemAt(0)
-
-        # # delete the old widget instance
-        # if hasattr(globals()['slicer'].modules, widgetName):
-        #   getattr(globals()['slicer'].modules, widgetName).cleanup()
-
-        # create new widget inside existing parent
-        globals()[widgetName.lower()] = eval(
-            'globals()["%s"].%s(parent)' % (moduleName, widgetName))
-        globals()[widgetName.lower()].setup()
-        setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
+        globals()[moduleName] = slicer.util.reloadScriptedModule(moduleName)
 
     def onReloadAndTest(self,moduleName="CardiacAgatstonMeasures"):
         try:
