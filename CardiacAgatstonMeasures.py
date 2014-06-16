@@ -84,8 +84,15 @@ class CardiacAgatstonMeasuresWidget:
             self.reloadButton.toolTip = "Reload this module."
             self.reloadButton.name = "CardiacAgatstonMeasures Reload"
             reloadFormLayout.addWidget(self.reloadButton)
-            #self.reloadButton.connect('clicked(bool)',self.onHelloWorldButtonClicked)
             self.reloadButton.connect('clicked()', self.onReload)
+
+            # reload and test button
+            # (use this during development, but remove it when delivering
+            #  your module to users)
+            self.reloadAndTestButton = qt.QPushButton("Reload and Test")
+            self.reloadAndTestButton.toolTip = "Reload this module and then run the self tests."
+            reloadFormLayout.addWidget(self.reloadAndTestButton)
+            self.reloadAndTestButton.connect('clicked()', self.onReloadAndTest)
 
         # Collapsible button for Input Parameters
         self.measuresCollapsibleButton = ctk.ctkCollapsibleButton()
@@ -277,6 +284,9 @@ class CardiacAgatstonMeasuresWidget:
             'globals()["%s"].%s(parent)' % (moduleName, widgetName))
         globals()[widgetName.lower()].setup()
         setattr(globals()['slicer'].modules, widgetName, globals()[widgetName.lower()])
+
+    def onReloadAndTest(self,moduleName="CardiacAgatstonMeasures"):
+        print "onReloadAndTest running"
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
