@@ -214,9 +214,6 @@ class CardiacAgatstonMeasuresWidget:
             Note: customized for use in LandmarkRegistration
             """
         import imp, sys, os, slicer
-        import SimpleITK as sitk
-        import sitkUtils as su
-        import EditorLib
 
         # selects default tool to stop the ChangeIslandTool
         if self.localCardiacEditorWidget:
@@ -241,24 +238,6 @@ class CardiacAgatstonMeasuresWidget:
             fp = open(filePath, "r")
             globals()[subModuleName] = imp.load_module(subModuleName, fp, filePath, ('.py', 'r', imp.PY_SOURCE))
             fp.close()
-
-        # # now reload all the support code and have the plugins
-        # # re-register themselves with slicer
-        # oldPlugins = slicer.modules.registrationPlugins
-        # slicer.modules.registrationPlugins = {}
-        # for plugin in oldPlugins.values():
-        #     pluginModuleName = plugin.__module__.lower()
-        #     if hasattr(slicer.modules,pluginModuleName):
-        #         # for a plugin from an extension, need to get the source path
-        #         # from the module
-        #         module = getattr(slicer.modules,pluginModuleName)
-        #         sourceFile = module.path
-        #     else:
-        #         # for a plugin built with slicer itself, the file path comes
-        #         # from the pyc path noted as __file__ at startup time
-        #         sourceFile = plugin.sourceFile.replace('.pyc', '.py')
-        #     imp.load_source(plugin.__module__, sourceFile)
-        # oldPlugins = None
 
         widgetName = moduleName + "Widget"
 
