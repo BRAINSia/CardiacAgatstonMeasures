@@ -421,35 +421,42 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         """
 
         self.delayDisplay("Starting the test")
-        #
-        # first, get some data
-        #
-        import urllib
-        # downloads = (
-        #     ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-        #     )
-        #
-        # for url,name,loader in downloads:
-        #   filePath = slicer.app.temporaryPath + '/' + name
-        #   if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-        #     print('Requesting download %s from %s...\n' % (name, url))
-        #     urllib.urlretrieve(url, filePath)
-        #   if loader:
-        #     print('Loading %s...\n' % (name,))
-        #     loader(filePath)
 
-        slicer.util.loadVolume('/scratch/p1_1.nii.gz')  #added tmp because slicer.kitware.com download not working
-        self.delayDisplay('Finished with download and loading\n')
+        try:
+            #
+            # first, get some data
+            #
+            import urllib
+            # downloads = (
+            #     ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
+            #     )
+            #
+            # for url,name,loader in downloads:
+            #   filePath = slicer.app.temporaryPath + '/' + name
+            #   if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
+            #     print('Requesting download %s from %s...\n' % (name, url))
+            #     urllib.urlretrieve(url, filePath)
+            #   if loader:
+            #     print('Loading %s...\n' % (name,))
+            #     loader(filePath)
 
-        volumeNode = slicer.util.getNode(pattern="p1_1") #added tmp because slicer.kitware.com download not working
-        # volumeNode = slicer.util.getNode(pattern="FA")
-        logic = CardiacAgatstonMeasuresLogic()
-        self.assertTrue( logic.hasImageData(volumeNode) )
-        self.delayDisplay('Test passed!')
+            slicer.util.loadVolume('/scratch/p1_1.nii.gz')  #added tmp because slicer.kitware.com download not working
+            self.delayDisplay('Finished with download and loading\n')
+
+            volumeNode = slicer.util.getNode(pattern="p1_1") #added tmp because slicer.kitware.com download not working
+            # volumeNode = slicer.util.getNode(pattern="FA")
+            logic = CardiacAgatstonMeasuresLogic()
+            self.assertTrue( logic.hasImageData(volumeNode) )
+            self.delayDisplay('Test passed!')
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
+            self.delayDisplay('Test caused exception!\n' + str(e))
 
     def test_CardiacAgatstonMeasures2(self):
         """ Level two test. Tests if the thresholded label
-        image is created.
+        image is created and if CardiacLUT file was
+        imported correctly.
         """
         self.delayDisplay("Starting the second level test")
 
