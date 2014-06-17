@@ -75,13 +75,6 @@ class CardiacAgatstonMeasuresWidget:
             self.setup()
             self.parent.show()
 
-        self.InputTestImageNode = None
-
-        # import test image
-        self.InputTestImageNode = slicer.util.getNode('p1_1')
-        if not self.InputTestImageNode:
-            slicer.util.loadVolume('/scratch/p1_1.nii.gz')
-
     def setup(self):
         # Instantiate and connect widgets ...
         
@@ -300,7 +293,7 @@ class CardiacAgatstonMeasuresLogic:
 
     def hasCorrectLUTData(self,lutNode):
         """This is a dummy logic method that
-        returns true if the passed in LLUT
+        returns true if the passed in LUT
         node has valid LUT table data
         """
         if not lutNode:
