@@ -189,6 +189,8 @@ class CardiacAgatstonMeasuresWidget:
             self.KEV80.checked, self.KEV120.checked, inputVolumeName)
         self.CardiacAgatstonMeasuresLogic.runThreshold()
 
+        self.thresholdButton.enabled = False
+
         # Creates and adds the custom Editor Widget to the module
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
