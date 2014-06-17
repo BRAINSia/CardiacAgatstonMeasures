@@ -273,6 +273,9 @@ class CardiacAgatstonMeasuresLogic:
         calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
         calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
 
+        self.setLowerPaintThreshold()
+
+    def setLowerPaintThreshold(self):
         # sets parameters for paint specific to KEV threshold level
         parameterNode = self.editUtil.getParameterNode()
         parameterNode.SetParameter("LabelEffect,paintOver","1")
