@@ -426,9 +426,12 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         image is created.
         """
         self.delayDisplay("Starting the second level test")
-
-
-
+        try:
+            pass
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
+            self.delayDisplay('Test caused exception!\n' + str(e))
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
