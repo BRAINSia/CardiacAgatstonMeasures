@@ -236,7 +236,7 @@ class CardiacAgatstonMeasuresLogic:
     this class and make use of the functionality without
     requiring an instance of the Widget
     """
-    def __init__(self, KEV80, KEV120, inputVolumeName):
+    def __init__(self, KEV80=False, KEV120=False, inputVolumeName=None):
         self.lowerThresholdValue = None
         self.upperThresholdValue = 5000
         self.editUtil = EditorLib.EditUtil.EditUtil()
@@ -272,7 +272,7 @@ class CardiacAgatstonMeasuresLogic:
     def assignLabelLUT(self, calciumName):
         # Set the color lookup table (LUT) to the custom cardiacLUT
         self.calciumLabelNode = slicer.util.getNode(calciumName)
-        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        self.cardiacLutNode = slicer.util.getNode(pattern='cardiacLUT')
         cardiacLutID = self.cardiacLutNode.GetID()
         calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
         calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
@@ -398,6 +398,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         """
         self.setUp()
         self.test_CardiacAgatstonMeasures1()
+        self.test_CardiacAgatstonMeasures2()
 
     def test_CardiacAgatstonMeasures1(self):
         """ Ideally you should have several levels of tests.  At the lowest level
@@ -443,8 +444,28 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         image is created.
         """
         self.delayDisplay("Starting the second level test")
+
         try:
-            pass
+            widget = slicer.modules.CardiacAgatstonMeasuresWidget
+            self.delayDisplay("Opened CardiacAgatstonMeasuresWidget")
+
+            widget.KEV120.setChecked(1)
+            self.delayDisplay("Checked the KEV120 button")
+
+            widget.onThresholdButtonClicked()
+            self.delayDisplay("Threshold button selected")
+
+            logic = CardiacAgatstonMeasuresLogic()
+
+            labelNode = slicer.util.getNode(pattern="p1_1_120KEV_130HU_Calcium_Label")
+            self.assertTrue( logic.hasImageData(labelNode) )
+            self.delayDisplay("Thresholded label created and pushed to Slicer")
+
+            lutNode = slicer.util.getNode(pattern="cardiacLUT")
+            self.assertTrue( logic.hasImageData(lutNode) )
+            self.delayDisplay("Cardiac LUT imported into Slicer")
+
+            self.delayDisplay('Test passed!')
         except Exception, e:
             import traceback
             traceback.print_exc()
