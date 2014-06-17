@@ -407,6 +407,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         self.setUp()
         self.test_CardiacAgatstonMeasures1()
         self.test_CardiacAgatstonMeasures2()
+        self.test_CardiacAgatstonMeasures3()
 
     def test_CardiacAgatstonMeasures1(self):
         """ Ideally you should have several levels of tests.  At the lowest level
@@ -485,6 +486,20 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             import traceback
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
+
+    def test_CardiacAgatstonMeasures3(self):
+        """ Level three test. Tests if the Editor tools
+        and five label buttons work properly.
+        """
+        self.delayDisplay("Starting the third level test")
+        
+        try:
+            pass
+        except Exception, e:
+            import traceback
+            traceback.print_exc()
+            self.delayDisplay('Test caused exception!\n' + str(e))
+
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
