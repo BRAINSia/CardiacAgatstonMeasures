@@ -174,6 +174,10 @@ class CardiacAgatstonMeasuresWidget:
         # Set local var as instance attribute
         self.thresholdButton = thresholdButton
 
+        # sets the layout to Red Slice Only
+        layoutManager = slicer.app.layoutManager()
+        layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutOneUpRedSliceView)
+
     def onThresholdButtonClicked(self):
         if not self.KEV120.checked and not self.KEV80.checked:
             qt.QMessageBox.warning(slicer.util.mainWindow(),
@@ -367,6 +371,9 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
     def setUp(self):
         """ Do whatever is needed to reset the state - typically a scene clear will be enough.
         """
+        self.delayDisplay("Closing the scene")
+        layoutManager = slicer.app.layoutManager()
+        layoutManager.setLayout(slicer.vtkMRMLLayoutNode.SlicerLayoutOneUpRedSliceView)
         slicer.mrmlScene.Clear(0)
 
     def runTest(self):
@@ -413,6 +420,15 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         logic = CardiacAgatstonMeasuresLogic()
         self.assertTrue( logic.hasImageData(volumeNode) )
         self.delayDisplay('Test passed!')
+
+    def test_CardiacAgatstonMeasures2(self):
+        """ Level two test. Tests if the thresholded label
+        image is created.
+        """
+        self.delayDisplay("Starting the second level test")
+
+
+
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
