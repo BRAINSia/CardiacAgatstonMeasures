@@ -14,15 +14,28 @@ import LabelStatistics
 class CardiacAgatstonMeasures:
     def __init__(self, parent):
         parent.title = "Cardiac Agatston Measures"
-        parent.categories = ["Cardiac Agatston Measures"]
+        parent.categories = ["Testing.TestCases"]
         parent.dependencies = []
         parent.contributors = ["Jessica Forbes (SINAPSE)",
                                "Hans Johnson (SINAPSE)"]
-        parent.helpText = """
-                                   This module will auto-segment the calcium deposits in Cardiac CT scans.  The user selects calcium clusters that represent calcium plaques.  The user then selects calcium clusters that do not represent calcium plaques and that should not be included in the final calculations.  Slicer will take the mean, peak, variance, mass and threshold and put the values into an Excel (or Excel compatible) file.
-                                   """
-        parent.acknowledgementText = """
-                                   This file was originally developed by Jessica Forbes and Hans Johnson of the SINAPSE Lab at the University of Iowa.""" # replace with organization, grant and thanks.
+        parent.helpText = """This module will auto-segment the calcium
+        deposits in Cardiac CT scans. The user first opens an image using
+        either "Add Data" or "DICOM".  Then selects the radio button for
+        either 80 KEV or 120 KEV. Then select the "Threshold Volume"
+        button. A thesholded label image will be created using a lower
+        threshold of 130 for 120 KEV or 167 for 80 KEV.  The user then
+        selects one of the five colored buttons: 1) Default - default
+        color of thresholded pixels, 2) LM - Left Main, 3) LAD - Left
+        Arterial Descending, 4) LCX - Left Circumflex, 5) RCA - Right
+        Coronary Artery. Note that the numbers 1-5 can also be used as
+        shortcut keys for these five buttons. The user selects "Apply"
+        to calculate the Agatston Scores and Label Statistics for each
+        label and all labels combined. These table values can then be
+        saved in an Excel (or Excel compatible) file using the "Save"
+        button."""
+        parent.acknowledgementText = """This file was originally developed
+         by Jessica Forbes and Hans Johnson of the SINAPSE Lab at the
+         University of Iowa.""" # replace with organization, grant and thanks.
         self.parent = parent
 
         # Add this test to the SelfTest module's list for discovery when the module
@@ -234,7 +247,8 @@ class CardiacAgatstonMeasuresWidget:
             import traceback
             traceback.print_exc()
             qt.QMessageBox.warning(slicer.util.mainWindow(),
-              "Reload and Test", 'Exception!\n\n' + str(e) + "\n\nSee Python Console for Stack Trace")
+              "Reload and Test", 'Exception!\n\n' + str(e) +
+                                 "\n\nSee Python Console for Stack Trace")
 
 #
 # CardiacAgatstonMeasuresLogic
