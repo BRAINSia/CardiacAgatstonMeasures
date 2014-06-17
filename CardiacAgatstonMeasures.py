@@ -298,6 +298,21 @@ class CardiacAgatstonMeasuresLogic:
             return False
         return True
 
+    def hasCorrectLUTData(self,lutNode):
+        """This is a dummy logic method that
+        returns true if the passed in LLUT
+        node has valid LUT table data
+        """
+        if not lutNode:
+            print('no Cardiac LUT node')
+            return False
+        number = lutNode.GetLookupTable().GetNumberOfAvailableColors()
+        if number == 7:
+            return True
+        else:
+            print('there should be 7 colors in LUT table, there are %s'%number)
+            return False
+
     def delayDisplay(self,message,msec=1000):
         #
         # logic version of delay display
@@ -462,7 +477,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.delayDisplay("Thresholded label created and pushed to Slicer")
 
             lutNode = slicer.util.getNode(pattern="cardiacLUT")
-            self.assertTrue( logic.hasImageData(lutNode) )
+            self.assertTrue( logic.hasCorrectLUTData(lutNode) )
             self.delayDisplay("Cardiac LUT imported into Slicer")
 
             self.delayDisplay('Test passed!')
