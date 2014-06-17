@@ -61,7 +61,6 @@ class CardiacAgatstonMeasuresWidget:
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
         self.inputImageNode = None
-        self.calciumLabelNode = None
         self.cardiacLutNode = None
         self.localCardiacEditorWidget = None
 
@@ -82,11 +81,6 @@ class CardiacAgatstonMeasuresWidget:
         self.InputTestImageNode = slicer.util.getNode('p1_1')
         if not self.InputTestImageNode:
             slicer.util.loadVolume('/scratch/p1_1.nii.gz')
-
-        # imports custom Slicer lookup color table file
-        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
-        if not self.cardiacLutNode:
-            slicer.util.loadColorTable('/scratch/cardiacLUT.ctbl')
 
     def setup(self):
         # Instantiate and connect widgets ...
@@ -249,6 +243,12 @@ class CardiacAgatstonMeasuresLogic:
         self.KEV80 = KEV80
         self.KEV120 = KEV120
         self.inputVolumeName = inputVolumeName
+        self.calciumLabelNode = None
+
+        # imports custom Slicer lookup color table file
+        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        if not self.cardiacLutNode:
+            slicer.util.loadColorTable('/scratch/cardiacLUT.ctbl')
 
     def runThreshold(self):
 
@@ -266,14 +266,16 @@ class CardiacAgatstonMeasuresLogic:
         castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
         su.PushLabel(castedThresholdImage, calciumName)
 
+        self.assignLabelLUT(calciumName)
+        self.setLowerPaintThreshold()
+
+    def assignLabelLUT(self, calciumName):
         # Set the color lookup table (LUT) to the custom cardiacLUT
         self.calciumLabelNode = slicer.util.getNode(calciumName)
         self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
         cardiacLutID = self.cardiacLutNode.GetID()
         calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
         calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
-
-        self.setLowerPaintThreshold()
 
     def setLowerPaintThreshold(self):
         # sets parameters for paint specific to KEV threshold level
