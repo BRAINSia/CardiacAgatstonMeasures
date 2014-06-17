@@ -58,8 +58,6 @@ class CardiacAgatstonMeasures:
 class CardiacAgatstonMeasuresWidget:
     def __init__(self, parent = None):
         self.currentRegistrationInterface = None
-        self.lowerThresholdValue = None
-        self.upperThresholdValue = 5000
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
         self.inputImageNode = None
@@ -186,38 +184,15 @@ class CardiacAgatstonMeasuresWidget:
 
         self.inputImageNode = self.inputSelector.currentNode()
         inputVolumeName = self.inputImageNode.GetName()
-        # Sets minimum threshold value based on KEV80 or KEV120
-        if self.KEV80.checked:
-            self.lowerThresholdValue = 167
-            calciumName = "{0}_80KEV_{1}HU_Calcium_Label".format(inputVolumeName, self.lowerThresholdValue)
-        elif self.KEV120.checked:
-            self.lowerThresholdValue = 130
-            calciumName = "{0}_120KEV_{1}HU_Calcium_Label".format(inputVolumeName, self.lowerThresholdValue)
 
-        print "Thresholding at {0}".format(self.lowerThresholdValue)
-        inputVolume = su.PullFromSlicer(inputVolumeName)
-        thresholdImage = sitk.BinaryThreshold(inputVolume, self.lowerThresholdValue, self.upperThresholdValue)
-        castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
-        su.PushLabel(castedThresholdImage, calciumName)
-
-        # Set the color lookup table (LUT) to the custom cardiacLUT
-        self.calciumLabelNode = slicer.util.getNode(calciumName)
-        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
-        cardiacLutID = self.cardiacLutNode.GetID()
-        calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
-        calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
+        self.CardiacAgatstonMeasuresLogic = CardiacAgatstonMeasuresLogic(
+            self.KEV80.checked, self.KEV120.checked, inputVolumeName)
+        self.CardiacAgatstonMeasuresLogic.runThreshold()
 
         # Creates and adds the custom Editor Widget to the module
         self.localCardiacEditorWidget = CardiacEditorWidget(parent=self.parent, showVolumesFrame=False)
         self.localCardiacEditorWidget.setup()
         self.localCardiacEditorWidget.enter()
-
-        # sets parameters for paint specific to KEV threshold level
-        parameterNode = self.editUtil.getParameterNode()
-        parameterNode.SetParameter("LabelEffect,paintOver","1")
-        parameterNode.SetParameter("LabelEffect,paintThreshold","1")
-        parameterNode.SetParameter("LabelEffect,paintThresholdMin","{0}".format(self.lowerThresholdValue))
-        parameterNode.SetParameter("LabelEffect,paintThresholdMax","{0}".format(self.upperThresholdValue))
 
         # Adds Label Statistics Widget to Module
         localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
@@ -265,8 +240,43 @@ class CardiacAgatstonMeasuresLogic:
     this class and make use of the functionality without
     requiring an instance of the Widget
     """
-    def __init__(self):
-        pass
+    def __init__(self, KEV80, KEV120, inputVolumeName):
+        self.lowerThresholdValue = None
+        self.upperThresholdValue = 5000
+        self.editUtil = EditorLib.EditUtil.EditUtil()
+        self.KEV80 = KEV80
+        self.KEV120 = KEV120
+        self.inputVolumeName = inputVolumeName
+
+    def runThreshold(self):
+
+        # Sets minimum threshold value based on KEV80 or KEV120
+        if self.KEV80:
+            self.lowerThresholdValue = 167
+            calciumName = "{0}_80KEV_{1}HU_Calcium_Label".format(self.inputVolumeName, self.lowerThresholdValue)
+        elif self.KEV120:
+            self.lowerThresholdValue = 130
+            calciumName = "{0}_120KEV_{1}HU_Calcium_Label".format(self.inputVolumeName, self.lowerThresholdValue)
+
+        print "Thresholding at {0}".format(self.lowerThresholdValue)
+        inputVolume = su.PullFromSlicer(self.inputVolumeName)
+        thresholdImage = sitk.BinaryThreshold(inputVolume, self.lowerThresholdValue, self.upperThresholdValue)
+        castedThresholdImage = sitk.Cast(thresholdImage, sitk.sitkInt16)
+        su.PushLabel(castedThresholdImage, calciumName)
+
+        # Set the color lookup table (LUT) to the custom cardiacLUT
+        self.calciumLabelNode = slicer.util.getNode(calciumName)
+        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
+        cardiacLutID = self.cardiacLutNode.GetID()
+        calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
+        calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
+
+        # sets parameters for paint specific to KEV threshold level
+        parameterNode = self.editUtil.getParameterNode()
+        parameterNode.SetParameter("LabelEffect,paintOver","1")
+        parameterNode.SetParameter("LabelEffect,paintThreshold","1")
+        parameterNode.SetParameter("LabelEffect,paintThresholdMin","{0}".format(self.lowerThresholdValue))
+        parameterNode.SetParameter("LabelEffect,paintThresholdMax","{0}".format(self.upperThresholdValue))
 
     def hasImageData(self,volumeNode):
         """This is a dummy logic method that
