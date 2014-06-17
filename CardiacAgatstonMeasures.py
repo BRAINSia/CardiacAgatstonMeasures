@@ -462,6 +462,9 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         self.delayDisplay("Starting the second level test")
 
         try:
+            m = slicer.util.mainWindow()
+            m.moduleSelector().selectModule('CardiacAgatstonMeasures')
+
             widget = slicer.modules.CardiacAgatstonMeasuresWidget
             self.delayDisplay("Opened CardiacAgatstonMeasuresWidget")
 
@@ -492,7 +495,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         and five label buttons work properly.
         """
         self.delayDisplay("Starting the third level test")
-        
+
         try:
             pass
         except Exception, e:
