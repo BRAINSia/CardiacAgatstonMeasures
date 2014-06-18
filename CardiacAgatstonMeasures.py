@@ -184,10 +184,10 @@ class CardiacAgatstonMeasuresWidget:
         self.localCardiacEditorWidget.enter()
 
         # Adds Label Statistics Widget to Module
-        localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
+        self.localLabelStatisticsWidget = CardiacStatisticsWidget(self.KEV120, self.KEV80,
                                                              self.localCardiacEditorWidget,
                                                              parent=self.parent)
-        localLabelStatisticsWidget.setup()
+        self.localLabelStatisticsWidget.setup()
 
     def onReload(self,moduleName="CardiacAgatstonMeasures"):
         """Generic reload method for any scripted module.
@@ -497,7 +497,39 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         self.delayDisplay("Starting the third level test")
 
         try:
-            pass
+            widget = slicer.modules.CardiacAgatstonMeasuresWidget
+            self.delayDisplay("Opened CardiacAgatstonMeasuresWidget")
+
+            # toolsBox = widget.localCardiacEditorWidget.toolsBox
+            # toolsBox.onLCXchangeIslandButtonClicked()
+
+            #
+            # got to the editor and do some drawing
+            #
+            self.delayDisplay("Paint some things")
+            editUtil = EditorLib.EditUtil.EditUtil()
+            lm = slicer.app.layoutManager()
+            paintEffect = EditorLib.PaintEffectOptions()
+            paintEffect.setMRMLDefaults()
+            paintEffect.__del__()
+            sliceWidget = lm.sliceWidget('Red')
+            paintTool = EditorLib.PaintEffectTool(sliceWidget)
+            editUtil.setLabel(5)
+            paintTool.paintAddPoint(133, 521)
+            paintTool.paintApply()
+            editUtil.setLabel(3)
+            paintTool.paintAddPoint(279, 550)
+            paintTool.paintApply()
+            paintTool.cleanup()
+            paintTool = None
+            self.delayDisplay("Painted calcium for LAD and RCA labels")
+
+            self.delayDisplay("Apply pressed - calculating Agatston scores/statistics")
+            widget.localLabelStatisticsWidget.onApply()
+            self.delayDisplay("Agatston scores/statistics are correct")
+
+            self.delayDisplay("Part 3 of Test passed!")
+
         except Exception, e:
             import traceback
             traceback.print_exc()
