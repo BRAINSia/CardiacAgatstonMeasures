@@ -526,6 +526,11 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
 
             self.delayDisplay("Apply pressed - calculating Agatston scores/statistics")
             widget.localLabelStatisticsWidget.onApply()
+
+            scores = widget.localLabelStatisticsWidget.logic.AgatstonScoresPerLabel
+            testScores = {0: 0, 1: 0, 2: 0, 3: 2.7833251953125018,
+                          4: 0, 5: 45.22903442382816, 6: 48.01235961914066}
+            self.assertTrue( scores == testScores )
             self.delayDisplay("Agatston scores/statistics are correct")
 
             self.delayDisplay("Part 3 of Test passed!")
@@ -880,7 +885,6 @@ class CardiacLabelStatisticsLogic(LabelStatistics.LabelStatisticsLogic):
                         AgatstonValue = slice_Agatston
 
                     sliceAgatstonPerLabel[label].append(AgatstonValue)
-        print sliceAgatstonPerLabel
         return sliceAgatstonPerLabel
 
 class CardiacEditorWidget(Editor.EditorWidget):
