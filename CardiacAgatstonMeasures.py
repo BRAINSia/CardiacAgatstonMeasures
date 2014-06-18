@@ -405,11 +405,11 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.test_CardiacAgatstonMeasures1()
-        self.test_CardiacAgatstonMeasures2()
-        self.test_CardiacAgatstonMeasures3()
+        self.testPart1ImportHeartScan()
+        self.testPart2Threshold()
+        self.testPart3PaintAndStatistics()
 
-    def test_CardiacAgatstonMeasures1(self):
+    def testPart1ImportHeartScan(self):
         """ Ideally you should have several levels of tests.  At the lowest level
         tests sould exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -421,7 +421,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         your test should break so they know that the feature is needed.
         """
 
-        self.delayDisplay("Starting the test")
+        self.delayDisplay("Starting Test Part 1 - Importing heart scan")
 
         try:
             #
@@ -448,18 +448,18 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             # volumeNode = slicer.util.getNode(pattern="FA")
             logic = CardiacAgatstonMeasuresLogic()
             self.assertTrue( logic.hasImageData(volumeNode) )
-            self.delayDisplay('Test passed!')
+            self.delayDisplay('Test Part 1 passed!')
         except Exception, e:
             import traceback
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
 
-    def test_CardiacAgatstonMeasures2(self):
+    def testPart2Threshold(self):
         """ Level two test. Tests if the thresholded label
         image is created and if CardiacLUT file was
         imported correctly.
         """
-        self.delayDisplay("Starting the second level test")
+        self.delayDisplay("Starting Test Part 2 - Thresholding")
 
         try:
             m = slicer.util.mainWindow()
@@ -484,17 +484,17 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.assertTrue( logic.hasCorrectLUTData(lutNode) )
             self.delayDisplay("Cardiac LUT imported into Slicer")
 
-            self.delayDisplay('Test passed!')
+            self.delayDisplay('Test Part 2 passed!')
         except Exception, e:
             import traceback
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
 
-    def test_CardiacAgatstonMeasures3(self):
+    def testPart3PaintAndStatistics(self):
         """ Level three test. Tests if the Editor tools
         and five label buttons work properly.
         """
-        self.delayDisplay("Starting the third level test")
+        self.delayDisplay("Starting Test Part 3 - Paint and Statistics")
 
         try:
             widget = slicer.modules.CardiacAgatstonMeasuresWidget
@@ -533,7 +533,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.assertTrue( scores == testScores )
             self.delayDisplay("Agatston scores/statistics are correct")
 
-            self.delayDisplay("Part 3 of Test passed!")
+            self.delayDisplay("Test Part 3 passed!")
 
         except Exception, e:
             import traceback
