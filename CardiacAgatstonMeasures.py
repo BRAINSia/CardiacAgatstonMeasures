@@ -515,10 +515,12 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             sliceWidget = lm.sliceWidget('Red')
             paintTool = EditorLib.PaintEffectTool(sliceWidget)
             editUtil.setLabel(5)
-            paintTool.paintAddPoint(133, 521)
+            (x, y) = self.rasToXY((38,165,-122), sliceWidget)
+            paintTool.paintAddPoint(x, y)
             paintTool.paintApply()
             editUtil.setLabel(3)
-            paintTool.paintAddPoint(279, 550)
+            (x, y) = self.rasToXY((12.5,171,-122), sliceWidget)
+            paintTool.paintAddPoint(x, y)
             paintTool.paintApply()
             paintTool.cleanup()
             paintTool = None
@@ -528,8 +530,8 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             widget.localLabelStatisticsWidget.onApply()
 
             scores = widget.localLabelStatisticsWidget.logic.AgatstonScoresPerLabel
-            testScores = {0: 0, 1: 0, 2: 0, 3: 2.7833251953125018,
-                          4: 0, 5: 45.22903442382816, 6: 48.01235961914066}
+            testScores = {0: 0, 1: 0, 2: 0, 3: 2.8703041076660174,
+                          4: 0, 5: 45.22903442382816, 6: 48.099338531494176}
             self.assertTrue( scores == testScores )
             self.delayDisplay("Agatston scores/statistics are correct")
 
@@ -540,6 +542,16 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
 
+    def rasToXY(self, rasPoint, sliceWidget):
+        sliceLogic = sliceWidget.sliceLogic()
+        sliceNode = sliceLogic.GetSliceNode()
+        rasToXY = vtk.vtkMatrix4x4()
+        rasToXY.DeepCopy(sliceNode.GetXYToRAS())
+        rasToXY.Invert()
+        xyzw = rasToXY.MultiplyPoint(rasPoint+(1,))
+        x = int(round(xyzw[0]))
+        y = int(round(xyzw[1]))
+        return x, y
 
 class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def __init__(self, KEV120, KEV80, localCardiacEditorWidget, parent=None):
