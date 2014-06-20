@@ -448,8 +448,6 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
                 )
 
             self.delayDisplay("Downloading")
-            # os.mkdir(slicer.app.temporaryPath)
-            # print '*'*50, '\n created path to slicer.app.temporaryPath'
 
             for url,name in downloads:
               filePath = os.path.join(slicer.app.temporaryPath, name)
@@ -469,14 +467,20 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.delayDisplay("Loading CardiacAgatstonMeasuresTestInput.nii.gz")
             inputImagePath = os.path.join(extractPath, 'CardiacAgatstonMeasuresTestInput.nii.gz')
             slicer.util.loadVolume(inputImagePath)
-
-            # slicer.util.loadVolume('/scratch/p1_1.nii.gz')  #added tmp because slicer.kitware.com download not working
-            self.delayDisplay('Finished with download and loading\n')
-
             volumeNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresTestInput")
             logic = CardiacAgatstonMeasuresLogic()
             self.assertTrue( logic.hasImageData(volumeNode) )
-            self.delayDisplay('Test Part 1 passed!')
+            self.delayDisplay('Finished with downloading and loading CardiacAgatstonMeasuresTestInput.nii.gz')
+
+            self.delayDisplay("Loading CardiacAgatstonMeasuresLUT.ctbl")
+            lutPath = os.path.join(extractPath, 'CardiacAgatstonMeasuresLUT.ctbl')
+            slicer.util.loadColorTable(lutPath)
+            lutNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresLUT")
+            logic = CardiacAgatstonMeasuresLogic()
+            self.assertTrue( logic.hasCorrectLUTData(lutNode) )
+            self.delayDisplay('Finished with downloading and loading CardiacAgatstonMeasuresLUT.ctbl')
+
+            self.delayDisplay('Test Part 1 passed!\n')
         except Exception, e:
             import traceback
             traceback.print_exc()
@@ -507,10 +511,6 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             labelNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresTestInput_120KEV_130HU_Calcium_Label")
             self.assertTrue( logic.hasImageData(labelNode) )
             self.delayDisplay("Thresholded label created and pushed to Slicer")
-
-            lutNode = slicer.util.getNode(pattern="cardiacLUT")
-            self.assertTrue( logic.hasCorrectLUTData(lutNode) )
-            self.delayDisplay("Cardiac LUT imported into Slicer")
 
             self.delayDisplay('Test Part 2 passed!')
         except Exception, e:
