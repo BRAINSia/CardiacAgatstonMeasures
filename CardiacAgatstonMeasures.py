@@ -405,11 +405,11 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.testPart1ImportHeartScan()
-        self.testPart2Threshold()
-        self.testPart3PaintAndStatistics()
+        self.test_CardiacAgatstonMeasures1()
+        self.test_CardiacAgatstonMeasures2()
+        self.test_CardiacAgatstonMeasures3()
 
-    def testPart1ImportHeartScan(self):
+    def test_CardiacAgatstonMeasures1(self):
         """ Ideally you should have several levels of tests.  At the lowest level
         tests sould exercise the functionality of the logic with different inputs
         (both valid and invalid).  At higher levels your tests should emulate the
@@ -454,7 +454,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
 
-    def testPart2Threshold(self):
+    def test_CardiacAgatstonMeasures2(self):
         """ Level two test. Tests if the thresholded label
         image is created and if CardiacLUT file was
         imported correctly.
@@ -490,7 +490,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             traceback.print_exc()
             self.delayDisplay('Test caused exception!\n' + str(e))
 
-    def testPart3PaintAndStatistics(self):
+    def test_CardiacAgatstonMeasures3(self):
         """ Level three test. Tests if the Editor tools
         and five label buttons work properly.
         """
