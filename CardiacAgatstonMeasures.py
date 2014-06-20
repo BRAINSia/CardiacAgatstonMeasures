@@ -427,7 +427,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             #
             # first, get some data
             #
-            import urllib
+            # import urllib
             # downloads = (
             #     ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
             #     )
@@ -441,11 +441,39 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             #     print('Loading %s...\n' % (name,))
             #     loader(filePath)
 
-            slicer.util.loadVolume('/scratch/p1_1.nii.gz')  #added tmp because slicer.kitware.com download not working
+            import urllib
+            downloads = (
+                ('http://www.na-mic.org/Wiki/images/4/4e/CardiacAgatstonMeasures_TutorialContestSummer2014.zip',
+                 'CardiacAgatstonMeasures_TutorialContestSummer2014.zip'),
+                )
+
+            self.delayDisplay("Downloading")
+            # os.mkdir(slicer.app.temporaryPath)
+            # print '*'*50, '\n created path to slicer.app.temporaryPath'
+
+            for url,name in downloads:
+              filePath = os.path.join(slicer.app.temporaryPath, name)
+              if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
+                print('Requesting download %s from %s...\n' % (name, url))
+                urllib.urlretrieve(url, filePath)
+            self.delayDisplay('Finished with download\n')
+
+            self.delayDisplay("Unzipping to  %s" % (slicer.app.temporaryPath))
+            zipFilePath = os.path.join(slicer.app.temporaryPath, 'CardiacAgatstonMeasures_TutorialContestSummer2014.zip')
+            extractPath = os.path.join(slicer.app.temporaryPath, 'CardiacAgatstonMeasures_TutorialContestSummer2014')
+            qt.QDir().mkpath(extractPath)
+            self.delayDisplay("Using extract path  %s" % (extractPath))
+            applicationLogic = slicer.app.applicationLogic()
+            applicationLogic.Unzip(zipFilePath, extractPath)
+
+            self.delayDisplay("Loading CardiacAgatstonMeasuresTestInput.nii.gz")
+            inputImagePath = os.path.join(extractPath, 'CardiacAgatstonMeasuresTestInput.nii.gz')
+            slicer.util.loadVolume(inputImagePath)
+
+            # slicer.util.loadVolume('/scratch/p1_1.nii.gz')  #added tmp because slicer.kitware.com download not working
             self.delayDisplay('Finished with download and loading\n')
 
-            volumeNode = slicer.util.getNode(pattern="p1_1") #added tmp because slicer.kitware.com download not working
-            # volumeNode = slicer.util.getNode(pattern="FA")
+            volumeNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresTestInput")
             logic = CardiacAgatstonMeasuresLogic()
             self.assertTrue( logic.hasImageData(volumeNode) )
             self.delayDisplay('Test Part 1 passed!')
@@ -476,7 +504,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
 
             logic = CardiacAgatstonMeasuresLogic()
 
-            labelNode = slicer.util.getNode(pattern="p1_1_120KEV_130HU_Calcium_Label")
+            labelNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresTestInput_120KEV_130HU_Calcium_Label")
             self.assertTrue( logic.hasImageData(labelNode) )
             self.delayDisplay("Thresholded label created and pushed to Slicer")
 
