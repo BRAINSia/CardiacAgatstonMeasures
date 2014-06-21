@@ -61,7 +61,6 @@ class CardiacAgatstonMeasuresWidget:
         self.changeIslandTool = None
         self.editUtil = EditorLib.EditUtil.EditUtil()
         self.inputImageNode = None
-        self.cardiacLutNode = None
         self.localCardiacEditorWidget = None
 
         if not parent:
@@ -237,11 +236,31 @@ class CardiacAgatstonMeasuresLogic:
         self.KEV120 = KEV120
         self.inputVolumeName = inputVolumeName
         self.calciumLabelNode = None
+        self.CardiacAgatstonMeasuresLUTNode = None
 
         # imports custom Slicer lookup color table file
-        self.cardiacLutNode = slicer.util.getNode('cardiacLUT')
-        if not self.cardiacLutNode:
-            slicer.util.loadColorTable('/scratch/cardiacLUT.ctbl')
+        self.CardiacAgatstonMeasuresLUTNode = slicer.util.getNode(pattern='CardiacAgatstonMeasuresLUT')
+        if not self.CardiacAgatstonMeasuresLUTNode:
+            import urllib
+            downloads = (
+                ('http://www.na-mic.org/Wiki/images/4/4e/CardiacAgatstonMeasures_TutorialContestSummer2014.zip',
+                 'CardiacAgatstonMeasures_TutorialContestSummer2014.zip'),
+                )
+
+            for url,name in downloads:
+              filePath = os.path.join(slicer.app.temporaryPath, name)
+              if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
+                print('Requesting download %s from %s...\n' % (name, url))
+                urllib.urlretrieve(url, filePath)
+
+            zipFilePath = os.path.join(slicer.app.temporaryPath, 'CardiacAgatstonMeasures_TutorialContestSummer2014.zip')
+            extractPath = os.path.join(slicer.app.temporaryPath, 'CardiacAgatstonMeasures_TutorialContestSummer2014')
+            qt.QDir().mkpath(extractPath)
+            applicationLogic = slicer.app.applicationLogic()
+            applicationLogic.Unzip(zipFilePath, extractPath)
+
+            lutPath = os.path.join(extractPath, 'CardiacAgatstonMeasuresLUT.ctbl')
+            slicer.util.loadColorTable(lutPath)
 
     def runThreshold(self):
 
@@ -263,12 +282,12 @@ class CardiacAgatstonMeasuresLogic:
         self.setLowerPaintThreshold()
 
     def assignLabelLUT(self, calciumName):
-        # Set the color lookup table (LUT) to the custom cardiacLUT
+        # Set the color lookup table (LUT) to the custom CardiacAgatstonMeasuresLUT
         self.calciumLabelNode = slicer.util.getNode(calciumName)
-        self.cardiacLutNode = slicer.util.getNode(pattern='cardiacLUT')
-        cardiacLutID = self.cardiacLutNode.GetID()
+        self.CardiacAgatstonMeasuresLUTNode = slicer.util.getNode(pattern='CardiacAgatstonMeasuresLUT')
+        CardiacAgatstonMeasuresLUTID = self.CardiacAgatstonMeasuresLUTNode.GetID()
         calciumDisplayNode = self.calciumLabelNode.GetDisplayNode()
-        calciumDisplayNode.SetAndObserveColorNodeID(cardiacLutID)
+        calciumDisplayNode.SetAndObserveColorNodeID(CardiacAgatstonMeasuresLUTID)
 
     def setLowerPaintThreshold(self):
         # sets parameters for paint specific to KEV threshold level
@@ -427,19 +446,8 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             #
             # first, get some data
             #
-            # import urllib
-            # downloads = (
-            #     ('http://slicer.kitware.com/midas3/download?items=5767', 'FA.nrrd', slicer.util.loadVolume),
-            #     )
-            #
-            # for url,name,loader in downloads:
-            #   filePath = slicer.app.temporaryPath + '/' + name
-            #   if not os.path.exists(filePath) or os.stat(filePath).st_size == 0:
-            #     print('Requesting download %s from %s...\n' % (name, url))
-            #     urllib.urlretrieve(url, filePath)
-            #   if loader:
-            #     print('Loading %s...\n' % (name,))
-            #     loader(filePath)
+            m = slicer.util.mainWindow()
+            m.moduleSelector().selectModule('CardiacAgatstonMeasures')
 
             import urllib
             downloads = (
@@ -472,12 +480,14 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.assertTrue( logic.hasImageData(volumeNode) )
             self.delayDisplay('Finished with downloading and loading CardiacAgatstonMeasuresTestInput.nii.gz')
 
-            self.delayDisplay("Loading CardiacAgatstonMeasuresLUT.ctbl")
-            lutPath = os.path.join(extractPath, 'CardiacAgatstonMeasuresLUT.ctbl')
-            slicer.util.loadColorTable(lutPath)
-            lutNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresLUT")
+            CardiacAgatstonMeasuresLUTNode = slicer.util.getNode(pattern='CardiacAgatstonMeasuresLUT')
+            if not CardiacAgatstonMeasuresLUTNode:
+                self.delayDisplay("Loading CardiacAgatstonMeasuresLUT.ctbl")
+                lutPath = os.path.join(extractPath, 'CardiacAgatstonMeasuresLUT.ctbl')
+                slicer.util.loadColorTable(lutPath)
+                CardiacAgatstonMeasuresLUTNode = slicer.util.getNode(pattern="CardiacAgatstonMeasuresLUT")
             logic = CardiacAgatstonMeasuresLogic()
-            self.assertTrue( logic.hasCorrectLUTData(lutNode) )
+            self.assertTrue( logic.hasCorrectLUTData(CardiacAgatstonMeasuresLUTNode) )
             self.delayDisplay('Finished with downloading and loading CardiacAgatstonMeasuresLUT.ctbl')
 
             self.delayDisplay('Test Part 1 passed!\n')
@@ -488,15 +498,12 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
 
     def test_CardiacAgatstonMeasures2(self):
         """ Level two test. Tests if the thresholded label
-        image is created and if CardiacLUT file was
+        image is created and if CardiacAgatstonMeasuresLUT file was
         imported correctly.
         """
         self.delayDisplay("Starting Test Part 2 - Thresholding")
 
         try:
-            m = slicer.util.mainWindow()
-            m.moduleSelector().selectModule('CardiacAgatstonMeasures')
-
             widget = slicer.modules.CardiacAgatstonMeasuresWidget
             self.delayDisplay("Opened CardiacAgatstonMeasuresWidget")
 
@@ -512,7 +519,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.assertTrue( logic.hasImageData(labelNode) )
             self.delayDisplay("Thresholded label created and pushed to Slicer")
 
-            self.delayDisplay('Test Part 2 passed!')
+            self.delayDisplay('Test Part 2 passed!\n')
         except Exception, e:
             import traceback
             traceback.print_exc()
@@ -563,7 +570,7 @@ class CardiacAgatstonMeasuresTest(unittest.TestCase):
             self.assertTrue( scores == testScores )
             self.delayDisplay("Agatston scores/statistics are correct")
 
-            self.delayDisplay("Test Part 3 passed!")
+            self.delayDisplay("Test Part 3 passed!\n")
 
         except Exception, e:
             import traceback
