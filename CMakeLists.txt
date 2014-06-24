@@ -9,7 +9,7 @@ set(EXTENSION_CATEGORY "Cardiac")
 set(EXTENSION_CONTRIBUTORS "Jessica Forbes (UIowa), Hans Johnson (UIowa)")
 set(EXTENSION_DESCRIPTION "This is an example of a simple extension")
 set(EXTENSION_ICONURL "http://www.example.com/Slicer/Extensions/CardiacAgastonMeasures/CardiacAgastonMeasures.png")
-set(EXTENSION_SCREENSHOTURLS "http://www.example.com/Slicer/Extensions/CardiacAgastonMeasures/Screenshots/1.png")
+set(EXTENSION_SCREENSHOTURLS "http://www.na-mic.org/Wiki/images/6/63/CardiacAgatstonMeasuresModuleScreenshot.jpg")
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
