@@ -132,6 +132,17 @@ class CardiacAgatstonMeasuresWidget:
         self.inputSelector.setMRMLScene( slicer.mrmlScene )
         self.inputFrame.layout().addWidget(self.inputSelector)
 
+        #
+        # scale factor for minimum threshold value
+        #
+        self.minimumThresholdValueSliderWidget = ctk.ctkSliderWidget()
+        self.minimumThresholdValueSliderWidget.singleStep = 1.0
+        self.minimumThresholdValueSliderWidget.minimum = 1.0
+        self.minimumThresholdValueSliderWidget.maximum = 300.0
+        self.minimumThresholdValueSliderWidget.value = 1.0
+        self.minimumThresholdValueSliderWidget.setToolTip("Set minimum threshold value.")
+        self.measuresFormLayout.addRow("Minimum threshold value", self.minimumThresholdValueSliderWidget)
+
         # Radio Buttons for Selecting 80 KEV or 120 KEV
         self.RadioButtonsFrame = qt.QFrame(self.measuresCollapsibleButton)
         self.RadioButtonsFrame.setLayout(qt.QHBoxLayout())
