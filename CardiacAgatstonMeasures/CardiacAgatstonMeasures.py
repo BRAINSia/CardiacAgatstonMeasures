@@ -665,11 +665,6 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
     def onApply(self):
         """Calculate the label statistics
         """
-        if not self.volumesAreValid():
-            qt.QMessageBox.warning(slicer.util.mainWindow(),
-                "Label Statistics", "Volumes do not have the same geometry.")
-            return
-
         # selects default tool to stop the ChangeIslandTool
         self.localCardiacEditorWidget.toolsBox.selectEffect("DefaultTool")
 
@@ -677,8 +672,22 @@ class CardiacStatisticsWidget(LabelStatistics.LabelStatisticsWidget):
         # TODO: why doesn't processEvents alone make the label text change?
         self.applyButton.repaint()
         slicer.app.processEvents()
-        self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, self.labelNode, self.KEV120, self.KEV80)
+        volumesLogic = slicer.modules.volumes.logic()
+        warnings = volumesLogic.CheckForLabelVolumeValidity(self.grayscaleNode, self.labelNode)
+        resampledLabelNode = None
+        if warnings != "":
+            if 'mismatch' in warnings:
+                resampledLabelNode = volumesLogic.ResampleVolumeToReferenceVolume(self.labelNode, self.grayscaleNode)
+                self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, resampledLabelNode, self.KEV120, self.KEV80)
+            else:
+                qt.QMessageBox.warning(slicer.util.mainWindow(),
+                    "Label Statistics", "Volumes do not have the same geometry.\n%s" % warnings)
+                return
+        else:
+            self.logic = CardiacLabelStatisticsLogic(self.grayscaleNode, self.labelNode, self.KEV120, self.KEV80)
         self.populateStats()
+        if resampledLabelNode:
+            slicer.mrmlScene.RemoveNode(resampledLabelNode)
         self.chartFrame.enabled = True
         self.saveButton.enabled = True
         self.applyButton.text = "Apply"
