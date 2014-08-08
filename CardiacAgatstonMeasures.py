@@ -139,7 +139,7 @@ class CardiacAgatstonMeasuresWidget:
         self.minimumThresholdValueSliderWidget.singleStep = 1.0
         self.minimumThresholdValueSliderWidget.minimum = 1.0
         self.minimumThresholdValueSliderWidget.maximum = 300.0
-        self.minimumThresholdValueSliderWidget.value = 1.0
+        self.minimumThresholdValueSliderWidget.value = 130.0
         self.minimumThresholdValueSliderWidget.setToolTip("Set minimum threshold value.")
         self.measuresFormLayout.addRow("Minimum threshold value", self.minimumThresholdValueSliderWidget)
 
@@ -182,8 +182,10 @@ class CardiacAgatstonMeasuresWidget:
         self.inputImageNode = self.inputSelector.currentNode()
         inputVolumeName = self.inputImageNode.GetName()
 
+        lowerThresholdValue = int(self.minimumThresholdValueSliderWidget.value)
+
         self.CardiacAgatstonMeasuresLogic = CardiacAgatstonMeasuresLogic(
-            self.KEV80.checked, self.KEV120.checked, inputVolumeName)
+            self.KEV80.checked, self.KEV120.checked, lowerThresholdValue, inputVolumeName)
         self.CardiacAgatstonMeasuresLogic.runThreshold()
 
         self.thresholdButton.enabled = False
@@ -239,8 +241,8 @@ class CardiacAgatstonMeasuresLogic:
     this class and make use of the functionality without
     requiring an instance of the Widget
     """
-    def __init__(self, KEV80=False, KEV120=False, inputVolumeName=None):
-        self.lowerThresholdValue = None
+    def __init__(self, KEV80=False, KEV120=False, lowerThresholdValue=None,inputVolumeName=None):
+        self.lowerThresholdValue = lowerThresholdValue
         self.upperThresholdValue = 5000
         self.editUtil = EditorLib.EditUtil.EditUtil()
         self.KEV80 = KEV80
@@ -277,10 +279,10 @@ class CardiacAgatstonMeasuresLogic:
 
         # Sets minimum threshold value based on KEV80 or KEV120
         if self.KEV80:
-            self.lowerThresholdValue = 167
+            # self.lowerThresholdValue = 167
             calciumName = "{0}_80KEV_{1}HU_Calcium_Label".format(self.inputVolumeName, self.lowerThresholdValue)
         elif self.KEV120:
-            self.lowerThresholdValue = 130
+            # self.lowerThresholdValue = 130
             calciumName = "{0}_120KEV_{1}HU_Calcium_Label".format(self.inputVolumeName, self.lowerThresholdValue)
 
         print "Thresholding at {0}".format(self.lowerThresholdValue)
