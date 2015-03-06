@@ -1041,7 +1041,7 @@ class CardiacEditBox(EditorLib.EditBox):
         # create all of the buttons
         # createButtonRow() ensures that only effects in self.effects are exposed,
         self.createButtonRow( ("PreviousCheckPoint", "NextCheckPoint",
-                               "DefaultTool", "PaintEffect"),
+                               "DefaultTool", "PaintEffect", "EraseLabel","ChangeIslandEffect"),
                               rowLabel="Undo/Redo/Default: " )
 
         extensions = []
@@ -1072,6 +1072,7 @@ class CardiacEditBox(EditorLib.EditBox):
         vbox.addStretch(1)
 
         self.updateUndoRedoButtons()
+        self._onParameterNodeModified(self.editUtil.getParameterNode())
 
     def onLMchangeIslandButtonClicked(self):
         self.changeIslandButtonClicked(2)
